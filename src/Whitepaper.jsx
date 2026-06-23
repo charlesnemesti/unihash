@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { id: 'signal-003', label: 'ONCHAIN ART' },
   { id: 'signal-004', label: 'CONTRACTS' },
   { id: 'signal-005', label: 'METADATA' },
-  { id: 'signal-006', label: 'THRESHOLD MINT' },
+  { id: 'signal-006', label: 'WHOLE-TOKEN MINT' },
   { id: 'signal-007', label: 'TOKENOMICS' },
   { id: 'signal-008', label: 'SECURITY' },
   { id: 'signal-009', label: 'VERIFICATION' },
@@ -228,7 +228,7 @@ export default function Whitepaper() {
             <SpecGrid
               specs={[
                 { label: 'Network', value: 'Ethereum L1' },
-                { label: 'Supply', value: '21,000,000 $HASH' },
+                { label: 'Supply', value: '5,000 $HASH' },
                 { label: 'Token', value: 'ERC-20 + ERC-721' },
               ]}
             />
@@ -242,17 +242,17 @@ export default function Whitepaper() {
             </p>
             <ItemGrid
               items={[
-                'one living Hash per 3,000 $HASH held',
+                'one living Hash per 1 whole $HASH held',
                 'generic ERC-20 transfers stay portable',
-                'dormant gaps below 3,000 reclaim excess Hashes on sell-down',
-                'sealed tokenURIs never mutate after freeze',
+                'fractional balances below 1 do not mint',
+                'drop below 1 whole token and the NFT burns',
               ]}
             />
           </DocCard>
 
           <DocCard id="signal-002" badge="// signal 002" title="Lifecycle">
             <p className="text-sm leading-relaxed text-zinc-400">
-              The system separates portable balances, live art, frozen claims, threshold spawns,
+              The system separates portable balances, live art, frozen claims, whole-token spawns,
               and irreversible seals.
             </p>
             <ItemGrid
@@ -260,8 +260,8 @@ export default function Whitepaper() {
                 'ERC-20 balance · portable $HASH through Uniswap and standard wallets',
                 'live Hash · objectURI recomputed on each tokenURI() call',
                 'sealed Hash · frozen tokenURI snapshot written at seal time',
-                'threshold spawn · every 3,000 $HASH authorizes one living Hash NFT',
-                'reclamation · selling below threshold burns or returns excess Hashes',
+                'whole-token spawn · 1 $HASH held authorizes 1 living Hash NFT',
+                'burn on sell-down · balance below 1 whole token burns the NFT',
                 'seal · one-way transition from live objectURI to frozen tokenURI',
               ]}
             />
@@ -295,7 +295,7 @@ export default function Whitepaper() {
             <ItemGrid
               items={[
                 'HashToken · ERC-20 coordination token, fixed supply, Uniswap v4 pool entry',
-                'HashRegistry · ERC-721 ledger, threshold mint, seal/freeze logic',
+                'HashRegistry · ERC-721 ledger, whole-token mint, seal/freeze logic',
                 'SvgRenderer · on-chain 24×24 SVG generator, pure function library',
                 'MetadataAssembler · Base64 JSON wrapper returning data:application/json',
               ]}
@@ -323,16 +323,16 @@ export default function Whitepaper() {
 }`}</CodeBlock>
           </DocCard>
 
-          <DocCard id="signal-006" badge="// signal 006" title="Threshold mint">
+          <DocCard id="signal-006" badge="// signal 006" title="Whole-token mint">
             <p className="text-sm leading-relaxed text-zinc-400">
               There is no public mint page. The registry watches $HASH balances on every transfer
-              and spawns or reclaims Hashes automatically.
+              and spawns or burns Hashes automatically — 1 whole token in, 1 NFT out; below 1, the NFT burns.
             </p>
             <ItemGrid
               items={[
-                '1 Hash per 3,000 $HASH — floor division, remainders do not mint',
+                '1 Hash per 1 whole $HASH — floor division, fractions do not mint',
                 'transfer-hook accounting spawns without a user transaction',
-                'reclamation on sell-down returns excess Hashes to the pool',
+                'balance below 1 whole token triggers an automatic NFT burn',
               ]}
             />
             <CodeBlock>{`struct SpawnRecord {
@@ -348,12 +348,13 @@ export default function Whitepaper() {
               Fair launch. Fixed supply. The entire allocation pairs against{' '}
               <Accent>1 ETH</Accent> at genesis — no team tokens, no vesting, no admin mint key.
             </p>
-            <CodeBlock>{`total supply:  21,000,000 $HASH
+            <CodeBlock>{`total supply:  5,000 $HASH
 decimals:      18
-max buy / tx:  21,000 (0.1% of supply)
-max wallet:    420,000 (2% of supply)
+max buy / tx:  5 (0.1% of supply)
+max wallet:    100 (2% of supply)
 swap fee:      4% → protocol treasury
-NFT transfer:  0% at protocol level`}</CodeBlock>
+NFT transfer:  0% at protocol level
+mint rule:     1 whole $HASH = 1 NFT · <1 burns`}</CodeBlock>
             <ItemGrid
               items={[
                 'native ETH / $HASH pool on Uniswap v4',
@@ -370,13 +371,13 @@ NFT transfer:  0% at protocol level`}</CodeBlock>
               if any exist at launch, are limited to pausing and carry a documented sunset timeline.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-              $HASH is portable as an ERC-20. Generic transfers do not spawn fresh Hashes;
-              unsupported balance gaps are reclaimed when holdings drop below the 3,000 threshold.
+              $HASH is portable as an ERC-20. Generic transfers update NFT entitlement on every balance
+              change — hold 1 whole token to keep your Hash; drop below 1 and it burns.
             </p>
             <ItemGrid
               items={[
                 'gas bounding via hard 24×24 render cap',
-                'threshold snapshots prevent gaming at mint boundaries',
+                'whole-token snapshots prevent gaming at mint boundaries',
                 'marketplace caching — seal to freeze for indexers',
                 'ownership renounce before public trading',
               ]}
