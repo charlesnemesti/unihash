@@ -1,5 +1,13 @@
 import './style.css';
 import * as THREE from 'three';
+import {
+  connect,
+  tryAutoConnect,
+  refresh,
+  claim,
+  initWalletListeners,
+  contractsConfigured,
+} from './web3/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // THREE.JS — HERO LANDING (animation groups)
@@ -141,40 +149,30 @@ function disposeHeroAnimation() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// WEB3 UI — SIMULATED WALLET + MINT FLOW
-// (Replace stubs with real contract calls via window.ethereum)
+// WEB3 UI — WALLET PANEL (viem + contract reads/writes)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const state = {
   connected: false,
   address: null,
-  quantity: 1,
-  minting: false,
-  sealing: false,
-  // Simulated on-chain reads — replace with contract calls
+  claiming: false,
+  refreshing: false,
   hashBalance: 0,
   hashesOwned: 0,
-  spawnBlock: null,
+  claimableEth: 0,
 };
-
-const MIN_QTY = 1;
-const MAX_QTY = 10;
 
 const $ = (id) => document.getElementById(id);
 
 const btnConnectHeader = $('btn-connect-header');
 const btnConnectWallet = $('btn-connect-wallet');
-const btnSeal = $('btn-seal');
-const btnSpawn = $('btn-spawn');
-const btnQtyMinus = $('btn-qty-minus');
-const btnQtyPlus = $('btn-qty-plus');
-const qtyDisplay = $('qty-display');
+const btnClaim = $('btn-claim');
 const statusText = $('status-text');
 const walletTerminalLine = $('wallet-terminal-line');
 const walletStatus = $('wallet-status');
 const statBalance = $('stat-balance');
 const statOwned = $('stat-owned');
-const statSpawnBlock = $('stat-spawn-block');
+const statClaimable = $('stat-claimable');
 
 function setStatus(message, tone = 'neutral') {
   const tones = {
@@ -193,11 +191,38 @@ function truncateAddress(address) {
 }
 
 function formatNumber(n) {
-  return n.toLocaleString('en-US');
+  if (!Number.isFinite(n)) return '0';
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+}
+
+function formatEth(n) {
+  if (!Number.isFinite(n) || n <= 0) return '0 ETH';
+  return `${n.toFixed(4)} ETH`;
+}
+
+function applyBalances(balances) {
+  state.hashBalance = balances.hashBalance;
+  state.hashesOwned = balances.hashesOwned;
+  state.claimableEth = balances.claimableEth;
+}
+
+function applyConnection(address, balances) {
+  state.connected = true;
+  state.address = address;
+  applyBalances(balances);
+}
+
+function clearConnection() {
+  state.connected = false;
+  state.address = null;
+  state.hashBalance = 0;
+  state.hashesOwned = 0;
+  state.claimableEth = 0;
 }
 
 function updateUI() {
-  const busy = state.minting || state.sealing;
+  const busy = state.claiming || state.refreshing;
   const connectLabel = state.connected && state.address
     ? truncateAddress(state.address)
     : 'Connect';
@@ -207,19 +232,14 @@ function updateUI() {
 
   btnConnectHeader.disabled = busy;
   btnConnectWallet.disabled = busy || state.connected;
-  btnSpawn.disabled = !state.connected || busy;
-  btnSeal.disabled = !state.connected || busy || state.hashesOwned === 0;
-
-  qtyDisplay.textContent = String(state.quantity);
-  btnQtyMinus.disabled = busy || state.quantity <= MIN_QTY;
-  btnQtyPlus.disabled = busy || state.quantity >= MAX_QTY;
+  btnClaim.disabled = !state.connected || busy || state.claimableEth <= 0;
 
   if (state.connected) {
     walletTerminalLine.textContent = `> connected: ${state.address}`;
     walletTerminalLine.className = 'mb-8 font-mono text-sm text-fluor';
     statBalance.textContent = formatNumber(state.hashBalance);
     statOwned.textContent = String(state.hashesOwned);
-    statSpawnBlock.textContent = state.spawnBlock ? `#${state.spawnBlock}` : '·';
+    statClaimable.textContent = formatEth(state.claimableEth);
     walletStatus.textContent = busy ? 'Processing' : 'Active';
     walletStatus.className = 'text-fluor';
   } else {
@@ -227,132 +247,92 @@ function updateUI() {
     walletTerminalLine.className = 'mb-8 font-mono text-sm text-white';
     statBalance.textContent = '·';
     statOwned.textContent = '·';
-    statSpawnBlock.textContent = '·';
+    statClaimable.textContent = '·';
     walletStatus.textContent = 'Idle';
     walletStatus.className = 'text-white';
   }
 }
 
-/**
- * Connect wallet — stub.
- *
- * TODO: Replace with real Web3 provider logic:
- *
- *   if (!window.ethereum) throw new Error('No wallet detected');
- *   const accounts = await window.ethereum.request({
- *     method: 'eth_requestAccounts',
- *   });
- *   const provider = new ethers.BrowserProvider(window.ethereum);
- *   const signer = await provider.getSigner();
- *   const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
- */
 async function connectWallet() {
-  if (state.connected) return;
+  if (state.connected || state.claiming) return;
 
   setStatus('Requesting wallet connection...', 'warn');
   walletStatus.textContent = 'Connecting';
 
   try {
-    // Simulated delay — remove when wiring real provider
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    const { address, balances } = await connect();
+    applyConnection(address, balances);
 
-    // TODO: const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    // TODO: state.hashBalance = await contract.balanceOf(accounts[0]);
-    // TODO: state.hashesOwned = await nftContract.balanceOf(accounts[0]);
-    const mockAddress = '0xC0FFEE' + Math.random().toString(16).slice(2, 10).padEnd(8, '0');
+    if (!contractsConfigured()) {
+      setStatus('Connected. Set contract addresses in .env to read balances.', 'warn');
+    } else if (balances.claimableEth > 0) {
+      setStatus('Connected. Rewards ready to claim.', 'success');
+    } else {
+      setStatus('Connected. Wallet synced on-chain.', 'success');
+    }
 
-    state.connected = true;
-    state.address = mockAddress;
-    state.hashBalance = 6240;
-    state.hashesOwned = 2;
-    state.spawnBlock = 19_842_103;
-
-    setStatus(`Connected. Ready to spawn ${state.quantity} $HASH.`, 'success');
     updateUI();
   } catch (error) {
     console.error('[UniHash] Wallet connection failed:', error);
-    setStatus('Connection rejected. Retry when ready.', 'error');
+    setStatus(error?.message ?? 'Connection rejected. Retry when ready.', 'error');
     walletStatus.textContent = 'Idle';
   }
 }
 
-/**
- * Mint / spawn tokens — stub.
- *
- * TODO: Replace simulation with on-chain mint:
- *
- *   const tx = await contract.mint(state.address, state.quantity, {
- *     value: parseEther(String(state.quantity * MINT_PRICE)),
- *   });
- *   setStatus('Transaction pending...', 'warn');
- *   const receipt = await tx.wait();
- *   setStatus(`Spawned ${state.quantity} $HASH at block ${receipt.blockNumber}.`, 'success');
- */
-async function spawnTokens() {
-  if (!state.connected || state.minting || state.sealing) return;
+async function claimRewards() {
+  if (!state.connected || state.claiming || state.claimableEth <= 0) return;
 
-  state.minting = true;
+  state.claiming = true;
   updateUI();
-  setStatus(`Spawning ${state.quantity} $HASH on-chain...`, 'warn');
+  setStatus('Claiming protocol rewards...', 'warn');
 
   try {
-    // Simulated mint latency — remove when wiring contract.mint()
-    await new Promise((resolve) => setTimeout(resolve, 2200));
-
-    setStatus(
-      `Success. ${state.quantity} token${state.quantity > 1 ? 's' : ''} spawned. Tx: 0x${Math.random().toString(16).slice(2, 10)}...`,
-      'success',
-    );
+    const claimed = state.claimableEth;
+    await claim(state.address);
+    const balances = await refresh(state.address);
+    applyBalances(balances);
+    setStatus(`Claimed ${formatEth(claimed)} from treasury.`, 'success');
   } catch (error) {
-    console.error('[UniHash] Mint failed:', error);
-    setStatus('Spawn failed. Check gas and retry.', 'error');
+    console.error('[UniHash] Claim failed:', error);
+    setStatus(error?.shortMessage ?? error?.message ?? 'Claim failed. Retry when ready.', 'error');
   } finally {
-    state.minting = false;
+    state.claiming = false;
     updateUI();
   }
 }
 
-/**
- * Seal Hash — stub.
- *
- * TODO: Replace with on-chain seal call:
- *   const tx = await nftContract.seal(tokenId);
- *   await tx.wait();
- */
-async function sealHash() {
-  if (!state.connected || state.sealing || state.hashesOwned === 0) return;
+async function handleAccountChange(address) {
+  if (!address) {
+    clearConnection();
+    setStatus('Wallet disconnected.', 'neutral');
+    updateUI();
+    return;
+  }
 
-  state.sealing = true;
+  state.refreshing = true;
   updateUI();
-  setStatus('Sealing Hash — freezing tokenURI on-chain...', 'warn');
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1800));
-    setStatus('Hash sealed. tokenURI frozen permanently.', 'success');
+    const balances = await refresh(address);
+    applyConnection(address, balances);
+    setStatus('Account switched. Balances updated.', 'success');
   } catch (error) {
-    console.error('[UniHash] Seal failed:', error);
-    setStatus('Seal failed. Retry when ready.', 'error');
+    console.error('[UniHash] Refresh failed:', error);
+    setStatus('Could not refresh balances.', 'error');
   } finally {
-    state.sealing = false;
+    state.refreshing = false;
     updateUI();
   }
 }
 
-function changeQuantity(delta) {
-  if (state.minting || state.sealing) return;
+async function tryRestoreSession() {
+  const session = await tryAutoConnect();
+  if (!session) return;
 
-  state.quantity = Math.min(MAX_QTY, Math.max(MIN_QTY, state.quantity + delta));
-
-  if (state.connected) {
-    setStatus(`Ready to spawn ${state.quantity} $HASH.`, 'success');
-  }
-
+  applyConnection(session.address, session.balances);
+  setStatus('Wallet reconnected.', 'success');
   updateUI();
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// LIVE HERO STATS — animated counters (replace with on-chain reads)
-// ═══════════════════════════════════════════════════════════════════════════
 
 function initHeroStats() {
   const targets = {
@@ -381,14 +361,10 @@ function initHeroStats() {
 function initWeb3UI() {
   btnConnectHeader.addEventListener('click', connectWallet);
   btnConnectWallet.addEventListener('click', connectWallet);
-  btnSeal.addEventListener('click', sealHash);
-  btnSpawn.addEventListener('click', spawnTokens);
-  btnQtyMinus.addEventListener('click', () => changeQuantity(-1));
-  btnQtyPlus.addEventListener('click', () => changeQuantity(1));
+  btnClaim.addEventListener('click', claimRewards);
 
-  // TODO: Listen for account/network changes from wallet provider
-  // window.ethereum?.on('accountsChanged', handleAccountsChanged);
-  // window.ethereum?.on('chainChanged', () => window.location.reload());
+  initWalletListeners(handleAccountChange);
+  tryRestoreSession();
 
   initHeroStats();
   updateUI();
