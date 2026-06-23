@@ -1,7 +1,5 @@
 import { formatEther, formatUnits } from 'viem';
-import { hashTokenAbi } from '../abis/hashToken.js';
-import { hashRegistryAbi } from '../abis/hashRegistry.js';
-import { rewardDistributorAbi } from '../abis/rewardDistributor.js';
+import { unihashAbi } from '../abis/unihash.js';
 import {
   CONTRACTS,
   DISTRIBUTOR_CLAIM_READ_FN,
@@ -44,13 +42,13 @@ export async function readWalletBalances(address) {
     const [balance, tokenDecimals] = await Promise.all([
       client.readContract({
         address: CONTRACTS.hashToken,
-        abi: hashTokenAbi,
+        abi: unihashAbi,
         functionName: 'balanceOf',
         args: [address],
       }),
       client.readContract({
         address: CONTRACTS.hashToken,
-        abi: hashTokenAbi,
+        abi: unihashAbi,
         functionName: 'decimals',
       }).catch(() => DEFAULT_DECIMALS),
     ]);
@@ -62,13 +60,13 @@ export async function readWalletBalances(address) {
   const hashBalance = Number.parseFloat(formatUnits(hashBalanceRaw, decimals));
 
   if (isDeployed(CONTRACTS.hashRegistry)) {
-    const nftBalance = await client.readContract({
+    const ownedIds = await client.readContract({
       address: CONTRACTS.hashRegistry,
-      abi: hashRegistryAbi,
-      functionName: 'balanceOf',
+      abi: unihashAbi,
+      functionName: 'ownedIds',
       args: [address],
     });
-    hashesOwned = Number(nftBalance);
+    hashesOwned = ownedIds.length;
   } else {
     hashesOwned = Math.floor(hashBalance);
   }
@@ -96,18 +94,20 @@ async function readClaimable(client, address) {
   try {
     return await client.readContract({
       address: CONTRACTS.rewardDistributor,
-      abi: rewardDistributorAbi,
+      abi: unihashAbi,
       functionName: fn,
       args: [address],
     });
   } catch (error) {
-    const fallbacks = ['claimable', 'pendingReward', 'earned'].filter((name) => name !== fn);
+    const fallbacks = ['withdrawableDividend', 'claimable', 'pendingReward', 'earned'].filter(
+      (name) => name !== fn,
+    );
 
     for (const name of fallbacks) {
       try {
         return await client.readContract({
           address: CONTRACTS.rewardDistributor,
-          abi: rewardDistributorAbi,
+          abi: unihashAbi,
           functionName: name,
           args: [address],
         });
@@ -129,24 +129,10 @@ export async function readOwnedTokenIds(address) {
   if (!isDeployed(CONTRACTS.hashRegistry)) return [];
 
   const client = getPublicClient();
-  const count = await client.readContract({
+  return client.readContract({
     address: CONTRACTS.hashRegistry,
-    abi: hashRegistryAbi,
-    functionName: 'balanceOf',
+    abi: unihashAbi,
+    functionName: 'ownedIds',
     args: [address],
   });
-
-  const total = Number(count);
-  const ids = await Promise.all(
-    Array.from({ length: total }, (_, index) =>
-      client.readContract({
-        address: CONTRACTS.hashRegistry,
-        abi: hashRegistryAbi,
-        functionName: 'tokenOfOwnerByIndex',
-        args: [address, BigInt(index)],
-      }),
-    ),
-  );
-
-  return ids;
 }

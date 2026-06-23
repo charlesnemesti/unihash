@@ -76,6 +76,26 @@ body {
   color: var(--fluor);
 }
 
+.btn-twitter {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid color-mix(in srgb, var(--white) 30%, transparent);
+  background: var(--void);
+  color: var(--white);
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.btn-twitter:hover {
+  border-color: var(--fluor);
+  color: var(--fluor);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 50%, transparent);
+}
+
 #gallery-container {
   position: fixed;
   inset: 0;
@@ -115,6 +135,15 @@ body {
   font-size: 0.8rem;
   line-height: 1.6;
   color: rgb(255 255 255 / 0.82);
+}
+
+.gallery-intro-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.65rem;
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fluor);
 }
 
 .gallery-showcase {
@@ -355,6 +384,18 @@ body {
     width: min(13rem, 90vw);
     transform: translateX(-50%);
   }
+}
+
+.gallery-showcase.is-empty .gallery-showcase-frame {
+  opacity: 0.35;
+}
+
+#gallery-container.is-empty {
+  display: none;
+}
+
+#gallery-menu.is-hidden {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

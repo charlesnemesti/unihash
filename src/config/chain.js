@@ -18,7 +18,7 @@ export const targetChain =
     name: `Chain ${envChainId}`,
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
-      default: { http: [import.meta.env.VITE_RPC_URL ?? 'https://eth.llamarpc.com'] },
+      default: { http: [import.meta.env.VITE_RPC_URL ?? 'https://ethereum.publicnode.com'] },
     },
   });
 

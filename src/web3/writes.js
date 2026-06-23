@@ -1,4 +1,4 @@
-import { rewardDistributorAbi } from '../abis/rewardDistributor.js';
+import { unihashAbi } from '../abis/unihash.js';
 import { CONTRACTS, isDeployed } from '../config/contracts.js';
 import { getPublicClient, getWalletClient } from './provider.js';
 
@@ -8,7 +8,7 @@ import { getPublicClient, getWalletClient } from './provider.js';
  */
 export async function claimRewards(address) {
   if (!isDeployed(CONTRACTS.rewardDistributor)) {
-    throw new Error('RewardDistributor not configured. Set VITE_REWARD_DISTRIBUTOR in .env');
+    throw new Error('Reward contract not configured. Set VITE_UNIHASH in .env');
   }
 
   const walletClient = getWalletClient();
@@ -22,17 +22,17 @@ export async function claimRewards(address) {
     hash = await walletClient.writeContract({
       account: address,
       address: CONTRACTS.rewardDistributor,
-      abi: rewardDistributorAbi,
-      functionName: 'claim',
+      abi: unihashAbi,
+      functionName: 'claimDividend',
       args: [],
     });
   } catch {
     hash = await walletClient.writeContract({
       account: address,
       address: CONTRACTS.rewardDistributor,
-      abi: rewardDistributorAbi,
+      abi: unihashAbi,
       functionName: 'claim',
-      args: [address],
+      args: [],
     });
   }
 

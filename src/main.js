@@ -13,6 +13,7 @@ import {
   openWalletModal,
   closeWalletDropdowns,
   initWalletDropdown,
+  readProtocolStats,
 } from './web3/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -400,28 +401,51 @@ async function tryRestoreSession() {
   updateUI();
 }
 
-function initHeroStats() {
-  const targets = {
-    'stat-hashes': 1284,
-    'stat-holders': 412,
-    'stat-spawned': 89_204,
+function animateStat(id, target) {
+  const el = $(id);
+  if (!el) return;
+
+  const safeTarget = Number.isFinite(target) ? Math.max(0, target) : 0;
+  if (safeTarget === 0) {
+    el.textContent = '0';
+    return;
+  }
+
+  let current = 0;
+  const step = Math.max(1, Math.ceil(safeTarget / 60));
+
+  const tick = () => {
+    current = Math.min(current + step, safeTarget);
+    el.textContent = formatNumber(current);
+    if (current < safeTarget) requestAnimationFrame(tick);
   };
 
-  Object.entries(targets).forEach(([id, target]) => {
+  requestAnimationFrame(tick);
+}
+
+async function initHeroStats() {
+  const ids = ['stat-hashes', 'stat-holders', 'stat-spawned'];
+  ids.forEach((id) => {
     const el = $(id);
-    if (!el) return;
-
-    let current = 0;
-    const step = Math.ceil(target / 60);
-
-    const tick = () => {
-      current = Math.min(current + step, target);
-      el.textContent = formatNumber(current);
-      if (current < target) requestAnimationFrame(tick);
-    };
-
-    requestAnimationFrame(tick);
+    if (el) el.textContent = '·';
   });
+
+  if (!contractsConfigured()) return;
+
+  try {
+    const stats = await readProtocolStats();
+    if (!stats) return;
+
+    animateStat('stat-hashes', stats.hashesAlive);
+    animateStat('stat-holders', stats.holders);
+    animateStat('stat-spawned', stats.blocksSpawned);
+  } catch (error) {
+    console.error('[UniHash] Could not load protocol stats:', error);
+    ids.forEach((id) => {
+      const el = $(id);
+      if (el) el.textContent = '—';
+    });
+  }
 }
 
 function initWeb3UI() {

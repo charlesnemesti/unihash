@@ -123,6 +123,20 @@
     box-shadow: none;
   }
 
+  .btn-twitter {
+    @apply inline-flex shrink-0 items-center justify-center rounded-none border bg-void transition-colors duration-200;
+    border-color: color-mix(in srgb, var(--white) 30%, transparent);
+    color: var(--white);
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .btn-twitter:hover {
+    border-color: var(--fluor);
+    color: var(--fluor);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 50%, transparent);
+  }
+
   .btn-primary {
     @apply inline-flex items-center rounded-none border px-6 py-3 font-mono text-xs uppercase tracking-widest transition-all duration-200;
     border-color: var(--fluor);

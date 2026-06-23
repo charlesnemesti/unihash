@@ -45,3 +45,23 @@
     font-size: 1.875rem;
   }
 }
+
+.btn-twitter {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgb(63 63 70);
+  background: #09090b;
+  color: #d4d4d8;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.btn-twitter:hover {
+  border-color: #dfff00;
+  color: #dfff00;
+  box-shadow: 0 0 14px color-mix(in srgb, #dfff00 50%, transparent);
+}

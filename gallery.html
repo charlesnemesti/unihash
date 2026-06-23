@@ -21,19 +21,33 @@
         <a href="/">Home</a>
         <a href="/#wallet">Wallet</a>
         <a href="/whitepaper.html">Whitepaper</a>
+        <a
+          href="https://x.com/Unihash_"
+          class="btn-twitter"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Follow UniHash on X"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
       </nav>
     </header>
 
     <div class="gallery-intro">
       <p class="gallery-intro-label">Gallery</p>
       <h1 class="gallery-intro-title">On-chain SVG grid</h1>
-      <p class="gallery-intro-copy">
-        120 Hash placeholders rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.
+      <p class="gallery-intro-copy" id="gallery-intro-copy">
+        120 preview Hashes rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.
+      </p>
+      <p class="gallery-intro-note" id="gallery-intro-note">
+        Preview mode — this grid will switch to live on-chain data once 120 Hashes are minted.
       </p>
     </div>
 
     <div class="gallery-showcase" aria-live="polite">
-      <p class="gallery-showcase-label">Live pattern</p>
+      <p class="gallery-showcase-label" id="gallery-showcase-label">Preview pattern</p>
       <div class="gallery-showcase-frame" id="gallery-showcase-frame">
         <svg id="gallery-showcase-svg" viewBox="0 0 24 24" role="img" aria-label="Animated Hash pattern preview"></svg>
       </div>

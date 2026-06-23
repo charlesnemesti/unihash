@@ -5,7 +5,9 @@ import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 import { GALLERY_HASH_COUNT, HASH_SVGS } from './hash-svgs.js';
+import { loadMintedHashes, readMintedCount } from './web3/protocol.js';
 
+const LIVE_GALLERY_THRESHOLD = 120;
 const TABLE_COLS = 12;
 const TABLE_SPACING_X = 132;
 const TABLE_SPACING_Y = 148;
@@ -23,6 +25,21 @@ const LAYOUT_BUTTON_IDS = {
   helix: 'layout-helix',
   grid: 'layout-grid',
 };
+
+/**
+ * @typedef {Object} GalleryEntry
+ * @property {string} hashId
+ * @property {string} owner
+ * @property {string} yieldLabel
+ * @property {string} svg
+ * @property {boolean} isPlaceholder
+ */
+
+/** @type {GalleryEntry[]} */
+let galleryEntries = [];
+
+/** @type {boolean} */
+let liveMode = false;
 
 /** @type {THREE.PerspectiveCamera | null} */
 let camera = null;
@@ -60,6 +77,12 @@ let layoutCycleId = null;
 /** @type {number} */
 let layoutIndex = 0;
 
+function formatEth(value) {
+  if (!Number.isFinite(value) || value <= 0) return '0 ETH';
+  if (value < 0.0001) return '<0.0001 ETH';
+  return `${value.toFixed(4)} ETH`;
+}
+
 /**
  * @param {number} seed
  */
@@ -71,20 +94,6 @@ function seededRandom(seed) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-/**
- * @param {number} count
- */
-function shuffleIndices(count) {
-  const indices = Array.from({ length: count }, (_, index) => index);
-
-  for (let i = indices.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [indices[i], indices[j]] = [indices[j], indices[i]];
-  }
-
-  return indices;
 }
 
 /**
@@ -108,26 +117,80 @@ function getHashPlaceholderMeta(catalogIndex) {
 }
 
 /**
- * @param {number} catalogIndex
+ * @returns {GalleryEntry[]}
  */
-function updateShowcaseDetails(catalogIndex) {
+function buildPlaceholderEntries() {
+  return Array.from({ length: GALLERY_HASH_COUNT }, (_, index) => {
+    const meta = getHashPlaceholderMeta(index);
+
+    return {
+      hashId: meta.hashId,
+      owner: meta.owner,
+      yieldLabel: meta.dailyYield,
+      svg: HASH_SVGS[index % HASH_SVGS.length],
+      isPlaceholder: true,
+    };
+  });
+}
+
+/**
+ * @param {import('./web3/protocol.js').MintedHash[]} hashes
+ * @returns {GalleryEntry[]}
+ */
+function buildLiveEntries(hashes) {
+  return hashes.map((hash) => ({
+    hashId: hash.hashId,
+    owner: hash.ownerShort,
+    yieldLabel: formatEth(hash.claimableEth),
+    svg: hash.svg,
+    isPlaceholder: false,
+  }));
+}
+
+/**
+ * @param {number} count
+ */
+function shuffleIndices(count) {
+  const indices = Array.from({ length: count }, (_, index) => index);
+
+  for (let i = indices.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  return indices;
+}
+
+function setShowcaseYieldLabel() {
+  const yieldLabel = document.querySelector(
+    '#gallery-showcase-details .gallery-showcase-detail:last-child dt',
+  );
+  if (!yieldLabel) return;
+  yieldLabel.textContent = liveMode ? 'Claimable rewards' : 'Daily yield';
+}
+
+/**
+ * @param {number} listIndex
+ */
+function updateShowcaseDetails(listIndex) {
   const details = document.getElementById('gallery-showcase-details');
   const hashIdEl = document.getElementById('gallery-showcase-hashid');
   const ownerEl = document.getElementById('gallery-showcase-owner');
   const yieldEl = document.getElementById('gallery-showcase-yield');
   if (!hashIdEl || !ownerEl || !yieldEl) return;
 
-  const meta = getHashPlaceholderMeta(catalogIndex);
+  const entry = galleryEntries[listIndex];
+  if (!entry) return;
 
   details?.classList.remove('is-updating');
   void details?.offsetWidth;
   details?.classList.add('is-updating');
 
-  hashIdEl.textContent = meta.hashId;
+  hashIdEl.textContent = entry.hashId;
   hashIdEl.classList.add('is-fluor');
-  ownerEl.textContent = meta.owner;
-  ownerEl.classList.remove('is-fluor');
-  yieldEl.textContent = meta.dailyYield;
+  ownerEl.textContent = entry.owner;
+  ownerEl.classList.toggle('is-fluor', !entry.isPlaceholder);
+  yieldEl.textContent = entry.yieldLabel;
   yieldEl.classList.add('is-fluor');
 }
 
@@ -156,15 +219,15 @@ function isCanvasBackground(shape) {
 }
 
 /**
- * @param {number} catalogIndex
+ * @param {number} listIndex
  */
-function renderShowcasePattern(catalogIndex) {
+function renderShowcasePattern(listIndex) {
   const svgRoot = document.getElementById('gallery-showcase-svg');
   const frame = document.getElementById('gallery-showcase-frame');
-  if (!svgRoot || !frame) return;
+  const entry = galleryEntries[listIndex];
+  if (!svgRoot || !frame || !entry) return;
 
-  const normalizedIndex = ((catalogIndex % HASH_SVGS.length) + HASH_SVGS.length) % HASH_SVGS.length;
-  const shapes = parseSvgShapes(HASH_SVGS[normalizedIndex]);
+  const shapes = parseSvgShapes(entry.svg);
 
   frame.classList.remove('is-jumping');
   void frame.offsetWidth;
@@ -188,19 +251,21 @@ function renderShowcasePattern(catalogIndex) {
     svgRoot.appendChild(node);
   });
 
-  updateShowcaseDetails(normalizedIndex);
+  updateShowcaseDetails(listIndex);
 
-  const activeCard = objects[normalizedIndex]?.element;
+  const activeCard = objects[listIndex]?.element;
   objects.forEach((object) => object.element.classList.remove('hash-element-active'));
   activeCard?.classList.add('hash-element-active');
 }
 
 function advancePatternShowcase() {
+  if (galleryEntries.length === 0) return;
+
   patternSlot += 1;
 
   if (patternSlot >= patternQueue.length) {
     patternSlot = 0;
-    patternQueue = shuffleIndices(HASH_SVGS.length);
+    patternQueue = shuffleIndices(galleryEntries.length);
   }
 
   renderShowcasePattern(patternQueue[patternSlot]);
@@ -208,9 +273,9 @@ function advancePatternShowcase() {
 
 function initPatternShowcase() {
   const svgRoot = document.getElementById('gallery-showcase-svg');
-  if (!svgRoot) return;
+  if (!svgRoot || galleryEntries.length === 0) return;
 
-  patternQueue = shuffleIndices(HASH_SVGS.length);
+  patternQueue = shuffleIndices(galleryEntries.length);
   patternSlot = 0;
 
   renderShowcasePattern(patternQueue[patternSlot]);
@@ -259,27 +324,26 @@ function onLayoutSelected(layoutKey) {
 }
 
 /**
- * @param {number} index
+ * @param {GalleryEntry} entry
  */
-function createHashElement(index) {
-  const tokenId = index + 1;
+function createHashElement(entry) {
   const element = document.createElement('article');
   element.className = 'hash-element';
-  element.setAttribute('aria-label', `Hash #${String(tokenId).padStart(4, '0')}`);
+  element.setAttribute('aria-label', `Hash ${entry.hashId}`);
 
   const number = document.createElement('p');
   number.className = 'hash-element-number';
-  number.textContent = `#${String(tokenId).padStart(4, '0')}`;
+  number.textContent = entry.hashId;
   element.appendChild(number);
 
   const art = document.createElement('div');
   art.className = 'hash-element-art';
-  art.innerHTML = `<svg viewBox="0 0 24 24" role="img" aria-hidden="true">${HASH_SVGS[index]}</svg>`;
+  art.innerHTML = `<svg viewBox="0 0 24 24" role="img" aria-hidden="true">${entry.svg}</svg>`;
   element.appendChild(art);
 
   const label = document.createElement('p');
   label.className = 'hash-element-label';
-  label.textContent = 'on-chain svg';
+  label.textContent = entry.isPlaceholder ? 'preview svg' : entry.owner;
   element.appendChild(label);
 
   return element;
@@ -287,15 +351,15 @@ function createHashElement(index) {
 
 function initGalleryScene() {
   const container = document.getElementById('gallery-container');
-  if (!container) return;
+  if (!container || galleryEntries.length === 0) return;
 
   camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.z = 2600;
 
   scene = new THREE.Scene();
 
-  for (let i = 0; i < GALLERY_HASH_COUNT; i += 1) {
-    const element = createHashElement(i);
+  for (let i = 0; i < galleryEntries.length; i += 1) {
+    const element = createHashElement(galleryEntries[i]);
     const objectCSS = new CSS3DObject(element);
 
     objectCSS.position.x = Math.random() * 3200 - 1600;
@@ -314,10 +378,11 @@ function initGalleryScene() {
   }
 
   const vector = new THREE.Vector3();
+  const count = objects.length;
 
-  for (let i = 0, l = objects.length; i < l; i += 1) {
-    const phi = Math.acos(-1 + (2 * i) / l);
-    const theta = Math.sqrt(l * Math.PI) * phi;
+  for (let i = 0; i < count; i += 1) {
+    const phi = Math.acos(-1 + (2 * i) / count);
+    const theta = Math.sqrt(count * Math.PI) * phi;
     const sphereTarget = new THREE.Object3D();
     sphereTarget.position.setFromSphericalCoords(860, phi, theta);
     vector.copy(sphereTarget.position).multiplyScalar(2);
@@ -325,7 +390,7 @@ function initGalleryScene() {
     targets.sphere.push(sphereTarget);
   }
 
-  for (let i = 0, l = objects.length; i < l; i += 1) {
+  for (let i = 0; i < count; i += 1) {
     const theta = i * 0.175 + Math.PI;
     const y = -(i * 8) + 450;
     const helixTarget = new THREE.Object3D();
@@ -337,7 +402,7 @@ function initGalleryScene() {
     targets.helix.push(helixTarget);
   }
 
-  for (let i = 0; i < objects.length; i += 1) {
+  for (let i = 0; i < count; i += 1) {
     const gridTarget = new THREE.Object3D();
     gridTarget.position.x = (i % 5) * 420 - 840;
     gridTarget.position.y = (-Math.floor(i / 5) % 5) * 420 + 840;
@@ -423,7 +488,80 @@ function disposeGalleryScene() {
   renderer?.domElement?.remove();
 }
 
-initGalleryScene();
+/**
+ * @param {number | null} mintedCount
+ */
+function updateGalleryIntroPlaceholder(mintedCount) {
+  const introCopy = document.getElementById('gallery-intro-copy');
+  const introNote = document.getElementById('gallery-intro-note');
+  const showcaseLabel = document.getElementById('gallery-showcase-label');
+
+  if (introCopy) {
+    introCopy.textContent =
+      '120 preview Hashes rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.';
+  }
+
+  if (introNote) {
+    const minted = Number.isFinite(mintedCount) ? mintedCount : 0;
+    const remaining = Math.max(0, LIVE_GALLERY_THRESHOLD - minted);
+    introNote.textContent =
+      remaining === LIVE_GALLERY_THRESHOLD
+        ? `Preview mode — this grid will switch to live on-chain data once ${LIVE_GALLERY_THRESHOLD} Hashes are minted.`
+        : `Preview mode — ${minted.toLocaleString('en-US')} / ${LIVE_GALLERY_THRESHOLD} minted. Live on-chain data unlocks at ${LIVE_GALLERY_THRESHOLD}.`;
+    introNote.hidden = false;
+  }
+
+  if (showcaseLabel) showcaseLabel.textContent = 'Preview pattern';
+}
+
+/**
+ * @param {number} count
+ */
+function updateGalleryIntroLive(count) {
+  const introCopy = document.getElementById('gallery-intro-copy');
+  const introNote = document.getElementById('gallery-intro-note');
+  const showcaseLabel = document.getElementById('gallery-showcase-label');
+
+  if (introCopy) {
+    introCopy.textContent =
+      count === 1
+        ? '1 living Hash rendered fully on-chain. Drag to explore, then switch layouts below.'
+        : `${count.toLocaleString('en-US')} living Hashes rendered fully on-chain. Drag to explore, then switch layouts below.`;
+  }
+
+  if (introNote) introNote.hidden = true;
+  if (showcaseLabel) showcaseLabel.textContent = 'Live pattern';
+}
+
+async function bootGallery() {
+  galleryEntries = buildPlaceholderEntries();
+  liveMode = false;
+
+  try {
+    const mintedCount = await readMintedCount();
+
+    if (mintedCount >= LIVE_GALLERY_THRESHOLD) {
+      const hashes = await loadMintedHashes();
+      if (hashes.length >= LIVE_GALLERY_THRESHOLD) {
+        galleryEntries = buildLiveEntries(hashes);
+        liveMode = true;
+        updateGalleryIntroLive(hashes.length);
+      } else {
+        updateGalleryIntroPlaceholder(mintedCount);
+      }
+    } else {
+      updateGalleryIntroPlaceholder(mintedCount);
+    }
+  } catch (error) {
+    console.warn('[UniHash] Could not read minted count — using preview gallery:', error);
+    updateGalleryIntroPlaceholder(null);
+  }
+
+  setShowcaseYieldLabel();
+  initGalleryScene();
+}
+
+bootGallery();
 
 if (import.meta.hot) {
   import.meta.hot.dispose(disposeGalleryScene);

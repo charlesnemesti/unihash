@@ -11,6 +11,7 @@ export {
 } from './wallet.js';
 
 export { readWalletBalances, readOwnedTokenIds } from './reads.js';
+export { readProtocolStats, loadMintedHashes, readMintedCount } from './protocol.js';
 export { getPublicClient, hasWalletProvider } from './provider.js';
 export { initWalletModal, openWalletModal, closeWalletModal } from './wallet-modal.js';
 export { initWalletDropdown, closeWalletDropdowns } from './wallet-dropdown.js';

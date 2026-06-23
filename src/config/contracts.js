@@ -7,19 +7,28 @@ function parseAddress(value, fallback = zero) {
   return value;
 }
 
+const unihash = parseAddress(import.meta.env.VITE_UNIHASH);
+
+function resolveContract(specific) {
+  const specificAddr = parseAddress(specific);
+  if (specificAddr !== zero) return specificAddr;
+  return unihash;
+}
+
 export const CONTRACTS = {
-  hashToken: parseAddress(import.meta.env.VITE_HASH_TOKEN),
-  hashRegistry: parseAddress(import.meta.env.VITE_HASH_REGISTRY),
-  rewardDistributor: parseAddress(import.meta.env.VITE_REWARD_DISTRIBUTOR),
+  unihash,
+  hashToken: resolveContract(import.meta.env.VITE_HASH_TOKEN),
+  hashRegistry: resolveContract(import.meta.env.VITE_HASH_REGISTRY),
+  rewardDistributor: resolveContract(import.meta.env.VITE_REWARD_DISTRIBUTOR),
   uniswapPool: parseAddress(import.meta.env.VITE_UNISWAP_POOL),
 };
 
 export const DISTRIBUTOR_CLAIM_READ_FN =
-  import.meta.env.VITE_DISTRIBUTOR_CLAIM_READ_FN ?? 'claimable';
+  import.meta.env.VITE_DISTRIBUTOR_CLAIM_READ_FN ?? 'withdrawableDividend';
 
 /** True when at least the core token contract is configured. */
 export function contractsConfigured() {
-  return CONTRACTS.hashToken !== zero;
+  return CONTRACTS.unihash !== zero || CONTRACTS.hashToken !== zero;
 }
 
 export function isDeployed(address) {
