@@ -20,3 +20,28 @@
     color: #000000;
   }
 }
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.site-logo-mark {
+  flex-shrink: 0;
+}
+
+.site-logo-text {
+  font-family: VT323, monospace;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .site-logo-text {
+    font-size: 1.875rem;
+  }
+}

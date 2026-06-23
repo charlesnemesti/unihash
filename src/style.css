@@ -84,6 +84,26 @@
     color: var(--fluor);
   }
 
+  .site-logo {
+    @apply inline-flex items-center gap-3 no-underline;
+  }
+
+  .site-logo-mark {
+    @apply shrink-0;
+  }
+
+  .site-logo-text {
+    @apply font-terminal text-2xl uppercase tracking-[0.12em] text-white md:text-3xl;
+  }
+
+  .wallet-modal-brand {
+    @apply flex items-center gap-3;
+  }
+
+  .wallet-panel-brand {
+    @apply flex items-center gap-3;
+  }
+
   .btn-terminal {
     @apply rounded-none border bg-void px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors duration-200;
     border-color: color-mix(in srgb, var(--white) 30%, transparent);

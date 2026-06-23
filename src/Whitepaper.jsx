@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Logo } from './Logo.jsx';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'ABSTRACT' },
@@ -146,12 +147,8 @@ export default function Whitepaper() {
     <>
       <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-          <a
-            href="/"
-            className="shrink-0 text-2xl uppercase tracking-[0.12em] text-fluor md:text-3xl"
-            style={{ fontFamily: "'VT323', monospace" }}
-          >
-            UniHash $HASH
+          <a href="/" className="site-logo shrink-0">
+            <Logo />
           </a>
           <div className="flex shrink-0 items-center gap-3">
             <a
@@ -172,7 +169,10 @@ export default function Whitepaper() {
 
       <div className="flex min-h-screen bg-zinc-950 font-mono text-zinc-300">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-zinc-800 p-6 lg:block">
-        <p className="mb-6 text-xs uppercase tracking-[0.28em] text-fluor">Docs</p>
+        <div className="mb-6 flex items-center gap-2">
+          <img src="/logo.svg" alt="" width="24" height="24" className="site-logo-mark" aria-hidden="true" />
+          <p className="text-xs uppercase tracking-[0.28em] text-fluor">Docs</p>
+        </div>
         <nav className="flex flex-col gap-1" aria-label="Section navigation">
           {NAV_ITEMS.map((item) => (
             <SidebarLink

@@ -8,6 +8,7 @@
       content="UniHash docs — EVM-native SVG renderer, Base64 core, and 100% on-chain Hash architecture."
     />
     <title>UniHash Docs · $HASH</title>
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,7 +20,10 @@
 
   <body class="bg-zinc-950">
     <div id="root">
-      <p style="padding:2rem;font-family:monospace;color:#DFFF00">Loading UniHash docs…</p>
+      <p style="padding:2rem;font-family:monospace;color:#DFFF00;display:flex;align-items:center;gap:0.75rem">
+        <img src="/logo.svg" alt="" width="28" height="28" aria-hidden="true" />
+        Loading UniHash docs…
+      </p>
     </div>
     <script type="module" src="/src/whitepaper-main.jsx"></script>
   </body>

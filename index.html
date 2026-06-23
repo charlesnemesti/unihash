@@ -8,6 +8,7 @@
       content="UniHash — Hold $HASH, spawn 100% on-chain SVG NFTs. EVM-native renderer & Base64 core."
     />
     <title>UniHash · $HASH · 100% On-Chain SVG Art</title>
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,8 +24,9 @@
       <!-- ═══ HEADER / NAV ═══ -->
       <header class="fixed top-0 left-0 right-0 z-50 border-b border-ui bg-void">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 md:px-10">
-          <a href="#" class="shrink-0 font-terminal text-2xl uppercase tracking-[0.12em] text-fluor md:text-3xl">
-            UniHash <span class="text-fluor">$HASH</span>
+          <a href="#" class="site-logo shrink-0">
+            <img src="/logo.svg" alt="" width="36" height="36" class="site-logo-mark" aria-hidden="true" />
+            <span class="site-logo-text">UniHash <span class="text-fluor">$HASH</span></span>
           </a>
 
           <nav class="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
@@ -316,7 +318,10 @@
 
             <div class="mx-auto max-w-xl">
               <div class="wallet-panel">
-                <p class="label-text mb-6">unihash · wallet</p>
+                <div class="wallet-panel-brand mb-6">
+                  <img src="/logo.svg" alt="" width="24" height="24" class="site-logo-mark" aria-hidden="true" />
+                  <p class="label-text">unihash · wallet</p>
+                </div>
 
                 <p id="wallet-terminal-line" class="mb-8 font-mono text-sm text-white">
                   &gt; awaiting connection…
@@ -381,7 +386,10 @@
         <div class="mx-auto max-w-6xl">
           <div class="mb-8 flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
             <div>
-              <p class="mb-3 font-terminal text-2xl text-fluor">uniHash</p>
+              <a href="#" class="site-logo mb-3">
+                <img src="/logo.svg" alt="" width="32" height="32" class="site-logo-mark" aria-hidden="true" />
+                <span class="site-logo-text text-2xl">uniHash</span>
+              </a>
               <p class="max-w-sm font-mono text-xs leading-relaxed text-white">
                 A coin you hold to spawn living on-chain SVG art — 1 whole $HASH mints 1 Hash NFT. Drop below
                 1 and it burns. Fully verifiable on Ethereum. Nothing here is financial advice.
@@ -409,7 +417,10 @@
       <div id="wallet-modal-backdrop" class="wallet-modal-backdrop" aria-hidden="true"></div>
       <div class="wallet-modal-panel">
         <div class="wallet-modal-header">
-          <p class="label-text">unihash · connect</p>
+          <div class="wallet-modal-brand">
+            <img src="/logo.svg" alt="" width="24" height="24" class="site-logo-mark" aria-hidden="true" />
+            <p class="label-text">unihash · connect</p>
+          </div>
           <button id="wallet-modal-close" type="button" class="wallet-modal-close" aria-label="Close">×</button>
         </div>
         <h2 id="wallet-modal-title" class="wallet-modal-title">Choose your wallet</h2>
