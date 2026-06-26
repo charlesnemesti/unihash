@@ -25,12 +25,15 @@ body {
   background: var(--void);
 }
 
-.gallery-header {
+.gallery-top-shell {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 20;
+}
+
+.gallery-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -96,6 +99,137 @@ body {
   box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 50%, transparent);
 }
 
+.ca-strip {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--fluor) 22%, transparent);
+  background: linear-gradient(
+    90deg,
+    rgb(0 0 0 / 0.95) 0%,
+    color-mix(in srgb, var(--fluor) 6%, rgb(0 0 0 / 0.92)) 50%,
+    rgb(0 0 0 / 0.95) 100%
+  );
+}
+
+.ca-strip-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fluor) 12%, transparent) 45%,
+    transparent 70%
+  );
+  animation: ca-strip-sweep 4.5s ease-in-out infinite;
+}
+
+.ca-strip.is-copied {
+  border-top-color: var(--fluor);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--fluor) 35%, transparent);
+}
+
+.ca-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 1.5rem;
+}
+
+.ca-strip-meta {
+  min-width: 0;
+  flex: 1 1 14rem;
+}
+
+.ca-strip-label {
+  margin: 0 0 0.2rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--fluor) 70%, var(--white));
+}
+
+.ca-strip-address {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.62rem, 2.2vw, 0.78rem);
+  letter-spacing: 0.06em;
+  color: var(--white);
+}
+
+.ca-strip-address.is-revealed {
+  color: var(--fluor);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--fluor) 45%, transparent);
+}
+
+.ca-strip-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ca-strip-link {
+  border: 1px solid color-mix(in srgb, var(--white) 22%, transparent);
+  background: transparent;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--white);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ca-strip-link:hover {
+  border-color: var(--fluor);
+  color: var(--fluor);
+}
+
+.ca-copy-btn {
+  border: 1px solid var(--fluor);
+  background: color-mix(in srgb, var(--fluor) 12%, transparent);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fluor);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.ca-copy-btn:hover {
+  background: color-mix(in srgb, var(--fluor) 22%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 40%, transparent);
+}
+
+.ca-copy-btn.is-copied {
+  background: var(--fluor);
+  color: var(--void);
+}
+
+@keyframes ca-strip-sweep {
+  0%,
+  100% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  55% {
+    transform: translateX(120%);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0;
+  }
+}
+
 #gallery-container {
   position: fixed;
   inset: 0;
@@ -107,7 +241,7 @@ body {
 
 .gallery-intro {
   position: fixed;
-  top: 5.5rem;
+  top: 8.25rem;
   left: 1.5rem;
   z-index: 10;
   max-width: 22rem;

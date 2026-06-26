@@ -1,9 +1,12 @@
 import './gallery.css';
 
+import { initCaStrip } from './ca-strip.js';
 import * as THREE from 'three';
 import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
+import { GALLERY_HASH_COUNT, HASH_SVGS } from './hash-svgs.js';
+import { liveDataEnabled } from './config/launch.js';
 import { loadMintedHashes, readMintedCount } from './web3/protocol.js';
 
 const GALLERY_DISPLAY_CAP = 120;
@@ -79,6 +82,73 @@ function formatEth(value) {
   if (!Number.isFinite(value) || value <= 0) return '0 ETH';
   if (value < 0.0001) return '<0.0001 ETH';
   return `${value.toFixed(4)} ETH`;
+}
+
+function seededRandom(seed) {
+  let t = seed + 0x6d2b79f5;
+
+  return () => {
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function getHashPlaceholderMeta(catalogIndex) {
+  const tokenId = catalogIndex + 1;
+  const rand = seededRandom(tokenId * 7919 + 104729);
+  const hexChar = () => Math.floor(rand() * 16).toString(16);
+
+  let wallet = '0x';
+  for (let i = 0; i < 40; i += 1) wallet += hexChar();
+
+  const dailyYield = (0.06 + rand() * 2.75).toFixed(3);
+
+  return {
+    hashId: `#${String(tokenId).padStart(4, '0')}`,
+    owner: `${wallet.slice(0, 6)}…${wallet.slice(-4)}`,
+    yieldLabel: `~${dailyYield} $HASH / day`,
+  };
+}
+
+function buildPlaceholderEntries() {
+  return Array.from({ length: GALLERY_HASH_COUNT }, (_, index) => {
+    const meta = getHashPlaceholderMeta(index);
+
+    return {
+      hashId: meta.hashId,
+      owner: meta.owner,
+      yieldLabel: meta.yieldLabel,
+      svg: HASH_SVGS[index % HASH_SVGS.length],
+    };
+  });
+}
+
+function initPlaceholderGallery() {
+  galleryEntries = buildPlaceholderEntries();
+
+  const introCopy = document.getElementById('gallery-intro-copy');
+  const introNote = document.getElementById('gallery-intro-note');
+  const showcaseLabel = document.getElementById('gallery-showcase-label');
+
+  if (introCopy) {
+    introCopy.textContent =
+      '120 preview Hashes rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.';
+  }
+
+  if (introNote) {
+    introNote.textContent = 'Preview mode — live on-chain data unlocks after launch.';
+    introNote.hidden = false;
+  }
+
+  if (showcaseLabel) showcaseLabel.textContent = 'Preview pattern';
+
+  const yieldLabel = document.querySelector(
+    '#gallery-showcase-details .gallery-showcase-detail:last-child dt',
+  );
+  if (yieldLabel) yieldLabel.textContent = 'Daily yield';
+
+  initGalleryScene();
 }
 
 /**
@@ -473,6 +543,13 @@ function updateGalleryIntro(displayedCount) {
 }
 
 async function bootGallery() {
+  initCaStrip();
+
+  if (!liveDataEnabled) {
+    initPlaceholderGallery();
+    return;
+  }
+
   const introCopy = document.getElementById('gallery-intro-copy');
   if (introCopy) introCopy.textContent = 'Loading on-chain Hashes from the contract…';
 

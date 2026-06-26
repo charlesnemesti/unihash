@@ -12,6 +12,7 @@
   </head>
 
   <body class="gallery-page">
+    <div class="gallery-top-shell">
     <header class="gallery-header">
       <a href="/" class="gallery-header-brand">
         <img src="/logo.svg" alt="" width="32" height="32" aria-hidden="true" />
@@ -35,17 +36,36 @@
       </nav>
     </header>
 
+    <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
+      <div class="ca-strip-glow" aria-hidden="true"></div>
+      <div class="ca-strip-inner">
+        <div class="ca-strip-meta">
+          <p class="ca-strip-label">&gt; contract_address · $HASH</p>
+          <code class="ca-strip-address" id="ca-address-display" title="UniHash token contract"></code>
+        </div>
+        <div class="ca-strip-actions">
+          <a id="ca-explorer-link" href="#" class="ca-strip-link" target="_blank" rel="noopener noreferrer">
+            Etherscan ↗
+          </a>
+          <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
     <div class="gallery-intro">
       <p class="gallery-intro-label">Gallery</p>
       <h1 class="gallery-intro-title">On-chain SVG grid</h1>
       <p class="gallery-intro-copy" id="gallery-intro-copy">
-        Loading on-chain Hashes from the contract…
+        120 preview Hashes rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.
       </p>
-      <p class="gallery-intro-note" id="gallery-intro-note" hidden></p>
+      <p class="gallery-intro-note" id="gallery-intro-note">
+        Preview mode — live on-chain data unlocks after launch.
+      </p>
     </div>
 
     <div class="gallery-showcase" aria-live="polite">
-      <p class="gallery-showcase-label" id="gallery-showcase-label">Live pattern</p>
+      <p class="gallery-showcase-label" id="gallery-showcase-label">Preview pattern</p>
       <div class="gallery-showcase-frame" id="gallery-showcase-frame">
         <svg id="gallery-showcase-svg" viewBox="0 0 24 24" role="img" aria-label="Animated Hash pattern preview"></svg>
       </div>
@@ -60,8 +80,8 @@
           <dd id="gallery-showcase-owner">0x0000…0000</dd>
         </div>
         <div class="gallery-showcase-detail">
-          <dt>Claimable rewards</dt>
-          <dd id="gallery-showcase-yield">0 ETH</dd>
+          <dt>Daily yield</dt>
+          <dd id="gallery-showcase-yield">~0.000 $HASH / day</dd>
         </div>
       </dl>
     </div>

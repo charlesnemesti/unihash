@@ -6,6 +6,7 @@ import {
   contractsConfigured,
   isDeployed,
 } from '../config/contracts.js';
+import { liveDataEnabled } from '../config/launch.js';
 import { getPublicClient } from './provider.js';
 
 const DEFAULT_DECIMALS = 18;
@@ -27,8 +28,10 @@ export async function readWalletBalances(address) {
     hashBalance: 0,
     hashesOwned: 0,
     claimableEth: 0,
-    contractsReady: contractsConfigured(),
+    contractsReady: contractsConfigured() && liveDataEnabled,
   };
+
+  if (!liveDataEnabled) return empty;
 
   if (!contractsConfigured()) return empty;
 

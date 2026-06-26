@@ -516,6 +516,132 @@
     -webkit-backdrop-filter: blur(10px);
   }
 
+  .ca-strip {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid color-mix(in srgb, var(--fluor) 22%, transparent);
+    background: linear-gradient(
+      90deg,
+      rgb(0 0 0 / 0.95) 0%,
+      color-mix(in srgb, var(--fluor) 6%, rgb(0 0 0 / 0.92)) 50%,
+      rgb(0 0 0 / 0.95) 100%
+    );
+  }
+
+  .ca-strip-glow {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      color-mix(in srgb, var(--fluor) 12%, transparent) 45%,
+      transparent 70%
+    );
+    animation: ca-strip-sweep 4.5s ease-in-out infinite;
+  }
+
+  .ca-strip.is-copied {
+    border-top-color: var(--fluor);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--fluor) 35%, transparent);
+  }
+
+  .ca-strip-meta {
+    min-width: 0;
+    flex: 1 1 14rem;
+  }
+
+  .ca-strip-label {
+    margin: 0 0 0.2rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--fluor) 70%, var(--white));
+  }
+
+  .ca-strip-address {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: clamp(0.62rem, 2.2vw, 0.78rem);
+    letter-spacing: 0.06em;
+    color: var(--white);
+  }
+
+  .ca-strip-address.is-revealed {
+    color: var(--fluor);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--fluor) 45%, transparent);
+  }
+
+  .ca-strip-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ca-strip-link {
+    border: 1px solid color-mix(in srgb, var(--white) 22%, transparent);
+    background: transparent;
+    padding: 0.35rem 0.65rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--white);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .ca-strip-link:hover {
+    border-color: var(--fluor);
+    color: var(--fluor);
+  }
+
+  .ca-copy-btn {
+    border: 1px solid var(--fluor);
+    background: color-mix(in srgb, var(--fluor) 12%, transparent);
+    padding: 0.35rem 0.75rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fluor);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  }
+
+  .ca-copy-btn:hover {
+    background: color-mix(in srgb, var(--fluor) 22%, transparent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 40%, transparent);
+  }
+
+  .ca-copy-btn.is-copied {
+    background: var(--fluor);
+    color: var(--void);
+  }
+
+  @keyframes ca-strip-sweep {
+    0%,
+    100% {
+      transform: translateX(-120%);
+      opacity: 0;
+    }
+    45% {
+      opacity: 1;
+    }
+    55% {
+      transform: translateX(120%);
+      opacity: 1;
+    }
+    70% {
+      opacity: 0;
+    }
+  }
+
   .site-footer-glass {
     background: rgb(0 0 0 / 0.8);
     backdrop-filter: blur(8px);
@@ -535,13 +661,13 @@
   .hero-content {
     position: relative;
     z-index: 2;
-    padding-top: 7rem;
+    padding-top: 8.5rem;
     padding-bottom: 0;
   }
 
   @media (min-width: 768px) {
     .hero-content {
-      padding-top: 8.5rem;
+      padding-top: 10rem;
     }
   }
 
@@ -688,9 +814,25 @@
 
   .hero-stats {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-stats-metrics {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem 2rem;
+  }
+
+  .hero-stats-launch {
+    margin: 0;
+    min-height: 1.25rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: lowercase;
+    color: var(--fluor);
   }
 
   .site-main {

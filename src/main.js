@@ -1,6 +1,9 @@
 import './style.css';
 import * as THREE from 'three';
 import { createHackedTypewriter, HERO_TYPEWRITER_TEXT } from './hacked-typewriter.js';
+import { liveDataEnabled, LAUNCH_TERMINAL_MESSAGE } from './config/launch.js';
+import { initLaunchHeroStats } from './launch-terminal-stats.js';
+import { initCaStrip } from './ca-strip.js';
 import {
   connect,
   tryAutoConnect,
@@ -304,10 +307,19 @@ function updateUI() {
   if (state.connected) {
     walletTerminalLine.textContent = `> connected: ${state.address}`;
     walletTerminalLine.className = 'mb-8 font-mono text-sm text-fluor';
-    statBalance.textContent = formatNumber(state.hashBalance);
-    statOwned.textContent = String(state.hashesOwned);
-    statClaimable.textContent = formatEth(state.claimableEth);
-    walletStatus.textContent = busy ? 'Processing' : 'Active';
+
+    if (liveDataEnabled) {
+      statBalance.textContent = formatNumber(state.hashBalance);
+      statOwned.textContent = String(state.hashesOwned);
+      statClaimable.textContent = formatEth(state.claimableEth);
+      walletStatus.textContent = busy ? 'Processing' : 'Active';
+    } else {
+      statBalance.textContent = '·';
+      statOwned.textContent = '·';
+      statClaimable.textContent = '·';
+      walletStatus.textContent = 'Ready after launch';
+    }
+
     walletStatus.className = 'text-fluor';
   } else {
     walletTerminalLine.textContent = '> awaiting connection…';
@@ -352,6 +364,8 @@ async function connectWithProvider(provider, rdns) {
 
     if (!contractsConfigured()) {
       setStatus('Connected. Set contract addresses in .env to read balances.', 'warn');
+    } else if (!liveDataEnabled) {
+      setStatus(`Connected. ${LAUNCH_TERMINAL_MESSAGE}.`, 'warn');
     } else if (balances.claimableEth > 0) {
       setStatus('Connected. Rewards ready to claim.', 'success');
     } else {
@@ -421,6 +435,12 @@ async function tryRestoreSession() {
 
 async function initHeroStats() {
   const ids = ['stat-hashes', 'stat-holders', 'stat-spawned'];
+
+  if (!liveDataEnabled) {
+    initLaunchHeroStats(ids, 'hero-stats-launch');
+    return;
+  }
+
   ids.forEach((id) => {
     const el = $(id);
     if (el) el.textContent = '·';
@@ -475,6 +495,8 @@ function initBuyLinks() {
 }
 
 async function initTokenomics() {
+  if (!liveDataEnabled) return;
+
   const supplyEl = $('token-total-supply');
   const symbolEl = $('token-symbol');
   if (!supplyEl) return;
@@ -501,6 +523,8 @@ function renderHashPreview(svgMarkup) {
 }
 
 async function initLandingOnChainContent() {
+  if (!liveDataEnabled) return;
+
   if (!contractsConfigured()) return;
 
   try {
@@ -587,6 +611,7 @@ function initWeb3UI() {
 
 initHeroAnimationGroups();
 initHeroTypewriter();
+initCaStrip();
 initWeb3UI();
 
 // Optional cleanup if hot-reloaded in dev

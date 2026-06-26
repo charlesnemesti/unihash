@@ -86,6 +86,28 @@
           <a href="gallery.html" class="nav-link text-xs">Gallery</a>
           <a href="whitepaper.html" class="nav-link text-xs">Whitepaper</a>
         </nav>
+
+        <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
+          <div class="ca-strip-glow" aria-hidden="true"></div>
+          <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-2.5 md:px-10">
+            <div class="ca-strip-meta">
+              <p class="ca-strip-label">&gt; contract_address · $HASH</p>
+              <code class="ca-strip-address" id="ca-address-display" title="UniHash token contract"></code>
+            </div>
+            <div class="ca-strip-actions">
+              <a
+                id="ca-explorer-link"
+                href="#"
+                class="ca-strip-link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan ↗
+              </a>
+              <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="site-main">
@@ -111,9 +133,12 @@
 
           <div class="hero-bottom">
             <div class="hero-stats font-mono text-xs uppercase tracking-widest text-white">
-              <span><span class="hero-stat-num" id="stat-hashes">·</span> Hashes alive</span>
-              <span><span class="hero-stat-num" id="stat-holders">·</span> holders</span>
-              <span><span class="hero-stat-num" id="stat-spawned">·</span> blocks spawned</span>
+              <div class="hero-stats-metrics">
+                <span><span class="hero-stat-num" id="stat-hashes">·</span> Hashes alive</span>
+                <span><span class="hero-stat-num" id="stat-holders">·</span> holders</span>
+                <span><span class="hero-stat-num" id="stat-spawned">·</span> blocks spawned</span>
+              </div>
+              <p id="hero-stats-launch" class="hero-stats-launch" aria-live="polite"></p>
             </div>
 
             <a href="#how-it-works" class="scroll-hint" aria-label="Scroll down">Scroll</a>
@@ -224,7 +249,7 @@
 
             <div class="panel-box mb-12">
               <p class="label-text mb-2">Total supply</p>
-              <p class="font-terminal text-5xl text-fluor md:text-6xl" id="token-total-supply">·</p>
+              <p class="font-terminal text-5xl text-fluor md:text-6xl" id="token-total-supply">5,000</p>
               <p class="mt-2 font-mono text-sm text-fluor"><span id="token-symbol">$HASH</span> · fixed forever</p>
               <p class="body-text mt-6 max-w-2xl">
                 It launched fairly, with the whole supply paired into the pool against 1 ETH and nothing

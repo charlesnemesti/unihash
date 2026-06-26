@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Logo } from './Logo.jsx';
 import { UNIHASH_CA, ETHERSCAN_TOKEN_URL, UNISWAP_BUY_URL } from './config/deployed.js';
+import { initCaStrip } from './ca-strip.js';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'ABSTRACT' },
@@ -139,6 +140,10 @@ export default function Whitepaper() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    initCaStrip();
+  }, []);
+
   const handleNav = (id) => {
     setActiveId(id);
     scrollToSection(id);
@@ -146,7 +151,8 @@ export default function Whitepaper() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
+      <div className="sticky top-0 z-50">
+      <header className="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
           <a href="/" className="site-logo shrink-0">
             <Logo />
@@ -180,6 +186,31 @@ export default function Whitepaper() {
           </div>
         </div>
       </header>
+
+      <div className="ca-strip" id="ca-strip" aria-label="Token contract address">
+        <div className="ca-strip-glow" aria-hidden="true" />
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-2.5">
+          <div className="ca-strip-meta min-w-0 flex-1">
+            <p className="ca-strip-label">&gt; contract_address · $HASH</p>
+            <code className="ca-strip-address" id="ca-address-display" title="UniHash token contract" />
+          </div>
+          <div className="ca-strip-actions flex shrink-0 items-center gap-2">
+            <a
+              id="ca-explorer-link"
+              href={ETHERSCAN_TOKEN_URL}
+              className="ca-strip-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan ↗
+            </a>
+            <button type="button" className="ca-copy-btn" id="ca-copy-btn">
+              Copy CA
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
 
       <div className="flex min-h-screen bg-zinc-950 font-mono text-zinc-300">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-zinc-800 p-6 lg:block">
@@ -387,7 +418,8 @@ export default function Whitepaper() {
               ]}
             />
             <CodeBlock>{`UniHash (token + NFT + hook)  ${UNIHASH_CA}
-Etherscan                      ${ETHERSCAN_TOKEN_URL}`}</CodeBlock>
+Etherscan                      ${ETHERSCAN_TOKEN_URL}
+Status                         ready after launch`}</CodeBlock>
             <p className="mt-6 text-sm leading-relaxed text-zinc-400">
               Hold $HASH, grow a Hash, earn rewards. Everything above runs on-chain the moment you cross 1
               whole token.
