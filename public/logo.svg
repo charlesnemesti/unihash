@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="UniHash">
-  <rect width="64" height="64" fill="#000000"/>
-  <rect x="4" y="4" width="56" height="56" fill="none" stroke="#DFFF00" stroke-width="3"/>
-  <rect x="12" y="14" width="12" height="12" fill="#DFFF00"/>
-  <rect x="40" y="26" width="12" height="12" fill="#DFFF00"/>
-  <rect x="16" y="44" width="32" height="10" fill="#DFFF00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="UniChain">
+  <rect width="64" height="64" fill="#04060d"/>
+  <circle cx="20" cy="32" r="10" fill="#ff1a4b"/>
+  <circle cx="44" cy="32" r="10" fill="#00e5ff"/>
+  <rect x="28" y="30" width="8" height="4" fill="#c8e8ff" rx="1"/>
+  <circle cx="20" cy="32" r="10" fill="none" stroke="#ff1a4b" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="44" cy="32" r="10" fill="none" stroke="#00e5ff" stroke-width="1.5" opacity="0.5"/>
 </svg>

@@ -1,0 +1,1054 @@
+warning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Whitepaper.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/main.js', LF will be replaced by CRLF the next time Git touches it
+diff --git a/.gitignore b/.gitignore
+index fffc792..45112a9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,6 +3,7 @@ dist
+ .vercel
+ .env
+ .env.*
++!.env.example
+ *.log
+ .DS_Store
+ terminals
+diff --git a/index.html b/index.html
+index 867cd05..37a7607 100644
+--- a/index.html
++++ b/index.html
+@@ -115,10 +115,10 @@
+ 
+               <article class="step-card">
+                 <span class="step-number">03</span>
+-                <h3 class="step-title">It lives on-chain forever</h3>
++                <h3 class="step-title">Claim your share</h3>
+                 <p class="step-body">
+-                  Each Hash is a 24×24 SVG rendered by smart contracts via Base64 JSON. Its look is read
+-                  from the chain, so it shifts as you hold and seal it. Sealing locks the art for good.
++                  Each Hash accrues protocol fees from the 4% swap tax. Rewards build in the background
++                  and you claim them whenever you want — no staking, no lockups.
+                 </p>
+               </article>
+             </div>
+@@ -212,9 +212,9 @@
+             </div>
+ 
+             <p class="body-text mt-8 max-w-3xl">
+-              That 4% fee funds on-chain rendering infrastructure and spawn-block metadata indexing.
+-              Every Hash carries its spawn block permanently in the contract state. The full mechanics
+-              live in the <a href="whitepaper.html" class="link-fluor">whitepaper</a>.
++              That 4% fee funds the protocol treasury and streams back to Hash holders by weight. A sealed
++              Hash can earn up to 2.5× more over time. The full mechanics live in the
++              <a href="whitepaper.html" class="link-fluor">whitepaper</a>.
+             </p>
+           </div>
+         </section>
+@@ -284,17 +284,16 @@
+           </div>
+         </section>
+ 
+-        <!-- ═══ WALLET / MINT ═══ -->
++        <!-- ═══ WALLET ═══ -->
+         <section id="wallet" class="section-pad" aria-labelledby="wallet-heading">
+           <div class="mx-auto max-w-6xl px-6 md:px-10">
+             <p class="section-label">Your wallet</p>
+-            <h2 id="wallet-heading" class="section-title mb-6">See your Hashes and spawn on-chain</h2>
++            <h2 id="wallet-heading" class="section-title mb-6">See your Hashes and claim your rewards</h2>
+             <p class="body-text mb-10 max-w-2xl">
+-              Connect a wallet to read your live holdings, and use the spawn panel to mint additional
+-              Hashes directly from the contract.
++              Connect a wallet to read your live holdings, and head to the gallery to see every Hash you own.
+             </p>
+ 
+-            <div class="grid gap-8 lg:grid-cols-2">
++            <div class="mx-auto max-w-xl">
+               <div class="wallet-panel">
+                 <p class="label-text mb-6">unihash · wallet</p>
+ 
+@@ -312,8 +311,8 @@
+                     <dd id="stat-owned">·</dd>
+                   </div>
+                   <div class="wallet-stat-row">
+-                    <dt>Spawn block</dt>
+-                    <dd id="stat-spawn-block">·</dd>
++                    <dt>Claimable rewards</dt>
++                    <dd id="stat-claimable">·</dd>
+                   </div>
+                   <div class="wallet-stat-row">
+                     <dt>Status</dt>
+@@ -323,27 +322,10 @@
+ 
+                 <div class="mt-8 flex flex-wrap gap-4">
+                   <button id="btn-connect-wallet" type="button" class="btn-primary">Connect</button>
+-                  <button id="btn-seal" type="button" class="btn-secondary" disabled>Seal Hash</button>
++                  <button id="btn-claim" type="button" class="btn-secondary" disabled>Claim rewards</button>
+                 </div>
+-              </div>
+-
+-              <div class="wallet-panel">
+-                <p class="label-text mb-6">spawn_terminal</p>
+-
+-                <div class="mb-8 flex items-center justify-between">
+-                  <span class="label-text">quantity</span>
+-                  <div class="flex items-center gap-4" role="group" aria-label="Mint quantity">
+-                    <button id="btn-qty-minus" type="button" class="qty-btn" aria-label="Decrease quantity">-</button>
+-                    <span id="qty-display" class="min-w-[2ch] text-center font-terminal text-3xl text-fluor" aria-live="polite">1</span>
+-                    <button id="btn-qty-plus" type="button" class="qty-btn" aria-label="Increase quantity">+</button>
+-                  </div>
+-                </div>
+-
+-                <button id="btn-spawn" type="button" class="btn-spawn mb-6" disabled aria-label="Spawn UniHash tokens">
+-                  [ SPAWN $HASH ]
+-                </button>
+ 
+-                <p class="border-t border-ui pt-4 font-mono text-xs" aria-live="polite">
++                <p class="mt-6 border-t border-ui pt-4 font-mono text-xs" aria-live="polite">
+                   <span class="text-fluor">Status:</span>
+                   <span id="status-text" class="text-white">Idle. Awaiting connection...</span>
+                 </p>
+diff --git a/package-lock.json b/package-lock.json
+index 29c0ca2..d268c6c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10,7 +10,8 @@
+       "dependencies": {
+         "react": "^19.2.7",
+         "react-dom": "^19.2.7",
+-        "three": "^0.170.0"
++        "three": "^0.170.0",
++        "viem": "^2.53.1"
+       },
+       "devDependencies": {
+         "@vitejs/plugin-react": "^4.3.4",
+@@ -20,6 +21,12 @@
+         "vite": "^6.0.3"
+       }
+     },
++    "node_modules/@adraffy/ens-normalize": {
++      "version": "1.11.1",
++      "resolved": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz",
++      "integrity": "sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==",
++      "license": "MIT"
++    },
+     "node_modules/@alloc/quick-lru": {
+       "version": "5.2.0",
+       "resolved": "https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz",
+@@ -807,6 +814,45 @@
+         "@jridgewell/sourcemap-codec": "^1.4.14"
+       }
+     },
++    "node_modules/@noble/ciphers": {
++      "version": "1.3.0",
++      "resolved": "https://registry.npmjs.org/@noble/ciphers/-/ciphers-1.3.0.tgz",
++      "integrity": "sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==",
++      "license": "MIT",
++      "engines": {
++        "node": "^14.21.3 || >=16"
++      },
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
++    "node_modules/@noble/curves": {
++      "version": "1.9.1",
++      "resolved": "https://registry.npmjs.org/@noble/curves/-/curves-1.9.1.tgz",
++      "integrity": "sha512-k11yZxZg+t+gWvBbIswW0yoJlu8cHOC7dhunwOzoWH/mXGBiYyR4YY6hAEK/3EUs4UpB8la1RfdRpeGsFHkWsA==",
++      "license": "MIT",
++      "dependencies": {
++        "@noble/hashes": "1.8.0"
++      },
++      "engines": {
++        "node": "^14.21.3 || >=16"
++      },
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
++    "node_modules/@noble/hashes": {
++      "version": "1.8.0",
++      "resolved": "https://registry.npmjs.org/@noble/hashes/-/hashes-1.8.0.tgz",
++      "integrity": "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==",
++      "license": "MIT",
++      "engines": {
++        "node": "^14.21.3 || >=16"
++      },
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
+     "node_modules/@nodelib/fs.scandir": {
+       "version": "2.1.5",
+       "resolved": "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz",
+@@ -1234,6 +1280,42 @@
+         "win32"
+       ]
+     },
++    "node_modules/@scure/base": {
++      "version": "1.2.6",
++      "resolved": "https://registry.npmjs.org/@scure/base/-/base-1.2.6.tgz",
++      "integrity": "sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==",
++      "license": "MIT",
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
++    "node_modules/@scure/bip32": {
++      "version": "1.7.0",
++      "resolved": "https://registry.npmjs.org/@scure/bip32/-/bip32-1.7.0.tgz",
++      "integrity": "sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==",
++      "license": "MIT",
++      "dependencies": {
++        "@noble/curves": "~1.9.0",
++        "@noble/hashes": "~1.8.0",
++        "@scure/base": "~1.2.5"
++      },
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
++    "node_modules/@scure/bip39": {
++      "version": "1.6.0",
++      "resolved": "https://registry.npmjs.org/@scure/bip39/-/bip39-1.6.0.tgz",
++      "integrity": "sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==",
++      "license": "MIT",
++      "dependencies": {
++        "@noble/hashes": "~1.8.0",
++        "@scure/base": "~1.2.5"
++      },
++      "funding": {
++        "url": "https://paulmillr.com/funding/"
++      }
++    },
+     "node_modules/@types/babel__core": {
+       "version": "7.20.5",
+       "resolved": "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.20.5.tgz",
+@@ -1306,6 +1388,27 @@
+         "vite": "^4.2.0 || ^5.0.0 || ^6.0.0"
+       }
+     },
++    "node_modules/abitype": {
++      "version": "1.2.3",
++      "resolved": "https://registry.npmjs.org/abitype/-/abitype-1.2.3.tgz",
++      "integrity": "sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==",
++      "license": "MIT",
++      "funding": {
++        "url": "https://github.com/sponsors/wevm"
++      },
++      "peerDependencies": {
++        "typescript": ">=5.0.4",
++        "zod": "^3.22.0 || ^4.0.0"
++      },
++      "peerDependenciesMeta": {
++        "typescript": {
++          "optional": true
++        },
++        "zod": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/any-promise": {
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/any-promise/-/any-promise-1.3.0.tgz",
+@@ -1644,6 +1747,12 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/eventemitter3": {
++      "version": "5.0.1",
++      "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz",
++      "integrity": "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==",
++      "license": "MIT"
++    },
+     "node_modules/fast-glob": {
+       "version": "3.3.3",
+       "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.3.tgz",
+@@ -1834,6 +1943,21 @@
+         "node": ">=0.12.0"
+       }
+     },
++    "node_modules/isows": {
++      "version": "1.0.7",
++      "resolved": "https://registry.npmjs.org/isows/-/isows-1.0.7.tgz",
++      "integrity": "sha512-I1fSfDCZL5P0v33sVqeTDSpcstAg/N+wF5HS033mogOVIp4B+oHC7oOCsA3axAbBSGTJ8QubbNmnIRN/h8U7hg==",
++      "funding": [
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/wevm"
++        }
++      ],
++      "license": "MIT",
++      "peerDependencies": {
++        "ws": "*"
++      }
++    },
+     "node_modules/jiti": {
+       "version": "1.21.7",
+       "resolved": "https://registry.npmjs.org/jiti/-/jiti-1.21.7.tgz",
+@@ -2009,6 +2133,36 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/ox": {
++      "version": "0.14.29",
++      "resolved": "https://registry.npmjs.org/ox/-/ox-0.14.29.tgz",
++      "integrity": "sha512-M5j87Ec4V99MQdRct/g09eWXW60g6zhHTUs1lr4deUtrPDnezBdCJTgKd7pxqTpSZBFveV0ALi9jMMuT1qKyNg==",
++      "funding": [
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/wevm"
++        }
++      ],
++      "license": "MIT",
++      "dependencies": {
++        "@adraffy/ens-normalize": "^1.11.0",
++        "@noble/ciphers": "^1.3.0",
++        "@noble/curves": "1.9.1",
++        "@noble/hashes": "^1.8.0",
++        "@scure/bip32": "^1.7.0",
++        "@scure/bip39": "^1.6.0",
++        "abitype": "^1.2.3",
++        "eventemitter3": "5.0.1"
++      },
++      "peerDependencies": {
++        "typescript": ">=5.4.0"
++      },
++      "peerDependenciesMeta": {
++        "typescript": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/path-parse": {
+       "version": "1.0.7",
+       "resolved": "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+@@ -2631,6 +2785,36 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/viem": {
++      "version": "2.53.1",
++      "resolved": "https://registry.npmjs.org/viem/-/viem-2.53.1.tgz",
++      "integrity": "sha512-FhfJ/SW73CVosiyVLmIMVgKDRKYV1AGCLzZoHYvmNayyVff63Qi1ocPCk59LqC/cNw244RbBJjHnmxqXkE7NpA==",
++      "funding": [
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/wevm"
++        }
++      ],
++      "license": "MIT",
++      "dependencies": {
++        "@noble/curves": "1.9.1",
++        "@noble/hashes": "1.8.0",
++        "@scure/bip32": "1.7.0",
++        "@scure/bip39": "1.6.0",
++        "abitype": "1.2.3",
++        "isows": "1.0.7",
++        "ox": "0.14.29",
++        "ws": "8.20.1"
++      },
++      "peerDependencies": {
++        "typescript": ">=5.0.4"
++      },
++      "peerDependenciesMeta": {
++        "typescript": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/vite": {
+       "version": "6.4.3",
+       "resolved": "https://registry.npmjs.org/vite/-/vite-6.4.3.tgz",
+@@ -2737,6 +2921,27 @@
+         "url": "https://github.com/sponsors/jonschlinkert"
+       }
+     },
++    "node_modules/ws": {
++      "version": "8.20.1",
++      "resolved": "https://registry.npmjs.org/ws/-/ws-8.20.1.tgz",
++      "integrity": "sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=10.0.0"
++      },
++      "peerDependencies": {
++        "bufferutil": "^4.0.1",
++        "utf-8-validate": ">=5.0.2"
++      },
++      "peerDependenciesMeta": {
++        "bufferutil": {
++          "optional": true
++        },
++        "utf-8-validate": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/yallist": {
+       "version": "3.1.1",
+       "resolved": "https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz",
+diff --git a/package.json b/package.json
+index 165c7ba..6b71e41 100644
+--- a/package.json
++++ b/package.json
+@@ -11,7 +11,8 @@
+   "dependencies": {
+     "react": "^19.2.7",
+     "react-dom": "^19.2.7",
+-    "three": "^0.170.0"
++    "three": "^0.170.0",
++    "viem": "^2.53.1"
+   },
+   "devDependencies": {
+     "@vitejs/plugin-react": "^4.3.4",
+diff --git a/src/Whitepaper.jsx b/src/Whitepaper.jsx
+index 502f041..b4a51bd 100644
+--- a/src/Whitepaper.jsx
++++ b/src/Whitepaper.jsx
+@@ -1,16 +1,15 @@
+ import { useEffect, useState } from 'react';
+ 
+ const NAV_ITEMS = [
+-  { id: 'overview', label: 'OVERVIEW' },
+-  { id: 'signal-001', label: 'ARTIFACTS' },
+-  { id: 'signal-002', label: 'LIFECYCLE' },
+-  { id: 'signal-003', label: 'ONCHAIN ART' },
+-  { id: 'signal-004', label: 'CONTRACTS' },
+-  { id: 'signal-005', label: 'METADATA' },
+-  { id: 'signal-006', label: 'WHOLE-TOKEN MINT' },
+-  { id: 'signal-007', label: 'TOKENOMICS' },
+-  { id: 'signal-008', label: 'SECURITY' },
+-  { id: 'signal-009', label: 'VERIFICATION' },
++  { id: 'overview', label: 'ABSTRACT' },
++  { id: 'signal-001', label: 'THE HYBRID' },
++  { id: 'signal-002', label: 'PROTOCOL YIELD' },
++  { id: 'signal-003', label: 'SEAL & BOND' },
++  { id: 'signal-004', label: 'FEE & POOL' },
++  { id: 'signal-005', label: 'LIMITS & LAUNCH' },
++  { id: 'signal-006', label: 'ONCHAIN ART' },
++  { id: 'signal-007', label: 'CONTRACTS' },
++  { id: 'signal-008', label: 'PARAMETERS' },
+ ];
+ 
+ function scrollToSection(id) {
+@@ -217,197 +216,174 @@ export default function Whitepaper() {
+         <div className="mx-auto max-w-4xl">
+           <DocCard
+             id="overview"
+-            badge="// unihash.protocol"
+-            title="UniHash Docs"
++            badge="// 00 · abstract"
++            title="Abstract"
+           >
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              <Accent>EVM-native SVG renderer</Accent> and Base64 core. Hold{' '}
+-              <Accent>$HASH</Accent>, spawn living <Accent>24×24</Accent> artifacts, seal them
+-              on-chain — no IPFS, no servers, no admin mint key.
++              Most tokens are inert and most NFTs sit idle. UniHash folds the two together.{' '}
++              <Accent>$HASH</Accent> is a normal ERC-20 you buy on Uniswap, but it is also the fuel for a
++              living NFT: hold <Accent>1 whole $HASH</Accent> and a <Accent>Hash</Accent> mints itself to
++              your wallet. Each Hash earns protocol rewards from swap fees for as long as you hold. Nothing
++              is staked, there is no mint page, and the art is drawn entirely on-chain.
+             </p>
+             <SpecGrid
+               specs={[
+                 { label: 'Network', value: 'Ethereum L1' },
+                 { label: 'Supply', value: '5,000 $HASH' },
+-                { label: 'Token', value: 'ERC-20 + ERC-721' },
++                { label: 'Model', value: 'DN404 hybrid' },
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-001" badge="// signal 001" title="Artifact model">
++          <DocCard id="signal-001" badge="// 01 · the hybrid" title="The hybrid">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              A <Accent>Hash</Accent> is the native on-chain object paired with{' '}
+-              <Accent>$HASH</Accent> holdings. The ERC-20 remains transferable even when an
+-              external venue cannot render the SVG directly.
++              $HASH is a <Accent>DN404-style hybrid</Accent>. The ERC-20 and the Hash ERC-721 are linked:
++              your Hash count always equals your balance divided by 1 (whole tokens only). Cross 1 and a
++              Hash appears; cross 2 and a second appears; sell below 1 and the NFT burns. No separate mint
++              transaction — it happens inside the transfer.
+             </p>
+             <ItemGrid
+               items={[
+-                'one living Hash per 1 whole $HASH held',
+-                'generic ERC-20 transfers stay portable',
+-                'fractional balances below 1 do not mint',
+-                'drop below 1 whole token and the NFT burns',
++                'pool, hook and contracts are flagged skipNFT — liquidity never mints Hashes',
++                'only real holders spawn living 24×24 SVG artifacts',
++                'fractional balances below 1 do not mint; drop below 1 and the NFT burns',
++                'transferring a Hash on a marketplace moves its 1 $HASH backing with it',
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-002" badge="// signal 002" title="Lifecycle">
++          <DocCard id="signal-002" badge="// 02 · protocol yield" title="Protocol yield">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              The system separates portable balances, live art, frozen claims, whole-token spawns,
+-              and irreversible seals.
++              Rewards are real and on-chain. The <Accent>4% swap fee</Accent> routes to a protocol treasury;
++              a distributor streams ETH back to Hash holders proportional to reward weight. Accrual is
++              automatic — you <Accent>claim whenever you want</Accent>.
++            </p>
++            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
++              Treat yield as variable, not a fixed APY. The Ethereum contracts handle the token, the Hashes,
++              and the payout trustlessly. Anyone can verify the distributor on Etherscan.
+             </p>
+             <ItemGrid
+               items={[
+-                'ERC-20 balance · portable $HASH through Uniswap and standard wallets',
+-                'live Hash · objectURI recomputed on each tokenURI() call',
+-                'sealed Hash · frozen tokenURI snapshot written at seal time',
+-                'whole-token spawn · 1 $HASH held authorizes 1 living Hash NFT',
+-                'burn on sell-down · balance below 1 whole token burns the NFT',
+-                'seal · one-way transition from live objectURI to frozen tokenURI',
++                'rewards accrue by magnified-dividend accounting — exact to the wei',
++                'live Hash weight: 100 · sealed bond max: 250 (2.5×)',
++                'claim() pulls accrued ETH from the treasury distributor',
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-003" badge="// signal 003" title="Onchain art">
++          <DocCard id="signal-003" badge="// 03 · seal & bond" title="Seal & bond">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              Base renders are compact <Accent>24×24 SVGs</Accent> generated from packed genome
+-              data. Stable traits stay fixed per artifact, while live Hashes read current balance
+-              state at render time. Sealed Hashes hold a frozen mutation snapshot.
+-            </p>
+-            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+-              No canonical offchain media dependency. GIF and MP4 exports are optional off-chain
+-              tooling for social avatars — not the source of truth.
++              A live Hash mirrors your balance — selling can burn it. <Accent>Sealing</Accent> locks 1 $HASH
++              into the contract and makes the Hash permanent, detached from your tradeable balance. In return
++              it starts a <Accent>bond</Accent> that grows the longer it stays sealed.
+             </p>
+             <ItemGrid
+               items={[
+-                '24×24 pixel grid mapped to SVG <rect> elements',
+-                'palette: void black, fluor yellow, white',
+-                'genome seed from owner address + spawn block + tokenId',
+-                'sealed snapshot freezes render in contract storage',
++                'live Hash reward weight: 100',
++                'sealed Hash weight climbs from 100 toward 250 over 90 days (2.5× max)',
++                'unsealing returns backing minus 8% burn and retires the Hash',
++                'sealed tokenURI is frozen permanently in contract storage',
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-004" badge="// signal 004" title="Contract surfaces">
++          <DocCard id="signal-004" badge="// 04 · fee & pool" title="Fee & the pool">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              UniHash is four primary public surfaces with linked renderer libraries behind them.
+-              Contracts are designed to be wired once, then locked by renouncing token ownership.
++              $HASH trades against ETH in a Uniswap v4 pool. A v4 <Accent>hook</Accent> takes a{' '}
++              <Accent>4% fee</Accent> on the ETH side of each swap and sends it to the treasury — funding
++              holder rewards. The hook adds no extra swap logic beyond the fee. Pool fee is zero; the hook
++              is the only fee.
+             </p>
+             <ItemGrid
+               items={[
+-                'HashToken · ERC-20 coordination token, fixed supply, Uniswap v4 pool entry',
+-                'HashRegistry · ERC-721 ledger, whole-token mint, seal/freeze logic',
+-                'SvgRenderer · on-chain 24×24 SVG generator, pure function library',
+-                'MetadataAssembler · Base64 JSON wrapper returning data:application/json',
++                'currency0: native ETH · currency1: $HASH',
++                'fee: 0 · hook: HashHook',
++                '4% ETH-side fee → treasury → distributor → holders',
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-005" badge="// signal 005" title="Metadata">
++          <DocCard id="signal-005" badge="// 05 · limits & launch" title="Limits & launch">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              UniHash metadata is onchain. Live Hashes mutate with holder state; sealed claims are
+-              frozen except through the one-way seal operation.
++              UniHash is a <Accent>fair launch</Accent>: the entire 5,000 $HASH supply pairs into the pool
++              with 1 ETH — no team allocation, nothing held back. Two limits enforce on-chain at open:
+             </p>
+             <ItemGrid
+               items={[
+-                'live Hashes render through objectURI',
+-                'sealed Hashes render through frozen tokenURI',
+-                'spawn block is retained in metadata',
+-                'SVG is canonical in the image field',
+-                'no canonical offchain media dependency',
++                'max 0.1% of supply per buy (5 $HASH)',
++                'max 2% of supply per wallet (100 $HASH)',
++                'limits liftable by owner after launch with a documented floor',
++                'ownership renounced before public trading',
+               ]}
+             />
+-            <CodeBlock>{`{
+-  "name": "Hash #0042",
+-  "description": "UniHash · 100% on-chain · spawn block 19842103",
+-  "image": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMjQgMjQnP..."
+-}`}</CodeBlock>
+           </DocCard>
+ 
+-          <DocCard id="signal-006" badge="// signal 006" title="Whole-token mint">
++          <DocCard id="signal-006" badge="// 06 · onchain art" title="Onchain art">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              There is no public mint page. The registry watches $HASH balances on every transfer
+-              and spawns or burns Hashes automatically — 1 whole token in, 1 NFT out; below 1, the NFT burns.
++              Every Hash is drawn on Ethereum, not hosted on a server. Renders are compact{' '}
++              <Accent>24×24 SVGs</Accent> generated from packed genome data. Live Hashes read current
++              balance state; sealed Hashes hold a frozen snapshot written at seal time.
+             </p>
+             <ItemGrid
+               items={[
+-                '1 Hash per 1 whole $HASH — floor division, fractions do not mint',
+-                'transfer-hook accounting spawns without a user transaction',
+-                'balance below 1 whole token triggers an automatic NFT burn',
++                'palette: void black, fluor yellow, white',
++                'genome seed from owner + spawn block + tokenId',
++                'live objectURI mutates · sealed tokenURI frozen forever',
++                'image field: inline data:image/svg+xml;base64 — no IPFS',
+               ]}
+             />
+-            <CodeBlock>{`struct SpawnRecord {
+-  uint64  spawnBlock;
+-  uint64  spawnTimestamp;
+-  address spawner;
+-  uint256 hashBalance;
++            <CodeBlock>{`{
++  "name": "Hash #0042",
++  "description": "UniHash · 100% on-chain · spawn block 19842103",
++  "image": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMjQgMjQnP..."
+ }`}</CodeBlock>
+           </DocCard>
+ 
+-          <DocCard id="signal-007" badge="// signal 007" title="$HASH tokenomics">
++          <DocCard id="signal-007" badge="// 07 · contracts" title="The contracts">
+             <p className="text-sm leading-relaxed text-zinc-400">
+-              Fair launch. Fixed supply. The entire allocation pairs against{' '}
+-              <Accent>1 ETH</Accent> at genesis — no team tokens, no vesting, no admin mint key.
++              The core is a small, readable set; the renderer is a pure library behind a single assembler.
++              All verifiable on Etherscan:
+             </p>
+-            <CodeBlock>{`total supply:  5,000 $HASH
+-decimals:      18
+-max buy / tx:  5 (0.1% of supply)
+-max wallet:    100 (2% of supply)
+-swap fee:      4% → protocol treasury
+-NFT transfer:  0% at protocol level
+-mint rule:     1 whole $HASH = 1 NFT · <1 burns`}</CodeBlock>
+             <ItemGrid
+               items={[
+-                'native ETH / $HASH pool on Uniswap v4',
+-                'exact-input buys only at launch',
+-                'no team allocation or vesting contracts',
+-                'no admin mint key after ownership renounce',
++                'HashToken · $HASH + hybrid + dividend points + seal/bond',
++                'HashRegistry · ERC-721 face of your Hashes',
++                'HashHook · v4 hook and swap fee',
++                'RewardDistributor · treasury ETH streams to holders',
++                'SvgRenderer + MetadataAssembler · on-chain 24×24 art',
+               ]}
+             />
+           </DocCard>
+ 
+-          <DocCard id="signal-008" badge="// signal 008" title="Security model">
+-            <p className="text-sm leading-relaxed text-zinc-400">
+-              Users trust Ethereum consensus and deployed bytecode — not a team server. Admin keys,
+-              if any exist at launch, are limited to pausing and carry a documented sunset timeline.
+-            </p>
+-            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+-              $HASH is portable as an ERC-20. Generic transfers update NFT entitlement on every balance
+-              change — hold 1 whole token to keep your Hash; drop below 1 and it burns.
+-            </p>
+-            <ItemGrid
+-              items={[
+-                'gas bounding via hard 24×24 render cap',
+-                'whole-token snapshots prevent gaming at mint boundaries',
+-                'marketplace caching — seal to freeze for indexers',
+-                'ownership renounce before public trading',
++          <DocCard id="signal-008" badge="// 08 · parameters" title="Parameters">
++            <SpecGrid
++              specs={[
++                { label: 'Supply', value: '5,000 $HASH' },
++                { label: '$HASH per Hash', value: '1 whole token' },
++                { label: 'Max buy / wallet', value: '5 / 100' },
+               ]}
+             />
+-          </DocCard>
+-
+-          <DocCard id="signal-009" badge="// signal 009" title="Source verification">
+-            <p className="text-sm leading-relaxed text-zinc-400">
+-              Published addresses should be verified against the release commit and contract size
+-              checks before integration. Anyone can audit a Hash without trusting this website.
+-            </p>
+             <ItemGrid
+               items={[
+-                '$HASH (ERC-20) · 0x0000…0000 · pending deploy',
+-                'HashRegistry · 0x0000…0000 · pending deploy',
+-                'SvgRenderer · 0x0000…0000 · pending deploy',
+-                'Uniswap v4 Pool · 0x0000…0000 · pending deploy',
++                'swap fee: 4% (hook → treasury → yield)',
++                'bond: 1.0× → 2.5× over 90 days sealed',
++                'unseal burn: 8% of backing',
++                'launch: fair, 100% into pool with 1 ETH',
++                'mint rule: ≥1 whole $HASH spawns · <1 burns',
+               ]}
+             />
+-            <CodeBlock>{`read tokenURI(tokenId) on HashRegistry
+-decode Base64 JSON → render inline SVG
+-cross-check spawnRecord(tokenId) vs block history
+-
+-α  testnet + whitepaper     Q2 2026
+-β  mainnet fair launch      Q3 2026
+-γ  marketplace integration  Q3 2026
+-δ  seal ceremony + gallery  Q4 2026`}</CodeBlock>
++            <CodeBlock>{`$HASH (ERC-20)          0x0000…0000  pending
++HashRegistry (ERC-721)  0x0000…0000  pending
++HashHook               0x0000…0000  pending
++RewardDistributor      0x0000…0000  pending
++Uniswap v4 Pool        0x0000…0000  pending`}</CodeBlock>
++            <p className="mt-6 text-sm leading-relaxed text-zinc-400">
++              Hold $HASH, grow a Hash, earn rewards. Everything above runs on-chain the moment you cross 1
++              whole token.
++            </p>
+             <p className="mt-6 border-t border-zinc-800 pt-6 text-xs leading-relaxed text-zinc-500">
+-              Docs are updated from the exact source tree being reviewed. This document is a
+-              technical specification draft — not financial or legal advice.
++              Docs updated from the source tree under review. Technical specification — not financial or
++              legal advice.
+             </p>
+             <div className="mt-6 flex flex-wrap gap-4">
+               <a
+diff --git a/src/main.js b/src/main.js
+index eeb7af3..022da85 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -1,5 +1,13 @@
+ import './style.css';
+ import * as THREE from 'three';
++import {
++  connect,
++  tryAutoConnect,
++  refresh,
++  claim,
++  initWalletListeners,
++  contractsConfigured,
++} from './web3/index.js';
+ 
+ // ═══════════════════════════════════════════════════════════════════════════
+ // THREE.JS — HERO LANDING (animation groups)
+@@ -141,40 +149,30 @@ function disposeHeroAnimation() {
+ }
+ 
+ // ═══════════════════════════════════════════════════════════════════════════
+-// WEB3 UI — SIMULATED WALLET + MINT FLOW
+-// (Replace stubs with real contract calls via window.ethereum)
++// WEB3 UI — WALLET PANEL (viem + contract reads/writes)
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
+ const state = {
+   connected: false,
+   address: null,
+-  quantity: 1,
+-  minting: false,
+-  sealing: false,
+-  // Simulated on-chain reads — replace with contract calls
++  claiming: false,
++  refreshing: false,
+   hashBalance: 0,
+   hashesOwned: 0,
+-  spawnBlock: null,
++  claimableEth: 0,
+ };
+ 
+-const MIN_QTY = 1;
+-const MAX_QTY = 10;
+-
+ const $ = (id) => document.getElementById(id);
+ 
+ const btnConnectHeader = $('btn-connect-header');
+ const btnConnectWallet = $('btn-connect-wallet');
+-const btnSeal = $('btn-seal');
+-const btnSpawn = $('btn-spawn');
+-const btnQtyMinus = $('btn-qty-minus');
+-const btnQtyPlus = $('btn-qty-plus');
+-const qtyDisplay = $('qty-display');
++const btnClaim = $('btn-claim');
+ const statusText = $('status-text');
+ const walletTerminalLine = $('wallet-terminal-line');
+ const walletStatus = $('wallet-status');
+ const statBalance = $('stat-balance');
+ const statOwned = $('stat-owned');
+-const statSpawnBlock = $('stat-spawn-block');
++const statClaimable = $('stat-claimable');
+ 
+ function setStatus(message, tone = 'neutral') {
+   const tones = {
+@@ -193,11 +191,38 @@ function truncateAddress(address) {
+ }
+ 
+ function formatNumber(n) {
+-  return n.toLocaleString('en-US');
++  if (!Number.isFinite(n)) return '0';
++  if (Number.isInteger(n)) return n.toLocaleString('en-US');
++  return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
++}
++
++function formatEth(n) {
++  if (!Number.isFinite(n) || n <= 0) return '0 ETH';
++  return `${n.toFixed(4)} ETH`;
++}
++
++function applyBalances(balances) {
++  state.hashBalance = balances.hashBalance;
++  state.hashesOwned = balances.hashesOwned;
++  state.claimableEth = balances.claimableEth;
++}
++
++function applyConnection(address, balances) {
++  state.connected = true;
++  state.address = address;
++  applyBalances(balances);
++}
++
++function clearConnection() {
++  state.connected = false;
++  state.address = null;
++  state.hashBalance = 0;
++  state.hashesOwned = 0;
++  state.claimableEth = 0;
+ }
+ 
+ function updateUI() {
+-  const busy = state.minting || state.sealing;
++  const busy = state.claiming || state.refreshing;
+   const connectLabel = state.connected && state.address
+     ? truncateAddress(state.address)
+     : 'Connect';
+@@ -207,19 +232,14 @@ function updateUI() {
+ 
+   btnConnectHeader.disabled = busy;
+   btnConnectWallet.disabled = busy || state.connected;
+-  btnSpawn.disabled = !state.connected || busy;
+-  btnSeal.disabled = !state.connected || busy || state.hashesOwned === 0;
+-
+-  qtyDisplay.textContent = String(state.quantity);
+-  btnQtyMinus.disabled = busy || state.quantity <= MIN_QTY;
+-  btnQtyPlus.disabled = busy || state.quantity >= MAX_QTY;
++  btnClaim.disabled = !state.connected || busy || state.claimableEth <= 0;
+ 
+   if (state.connected) {
+     walletTerminalLine.textContent = `> connected: ${state.address}`;
+     walletTerminalLine.className = 'mb-8 font-mono text-sm text-fluor';
+     statBalance.textContent = formatNumber(state.hashBalance);
+     statOwned.textContent = String(state.hashesOwned);
+-    statSpawnBlock.textContent = state.spawnBlock ? `#${state.spawnBlock}` : '·';
++    statClaimable.textContent = formatEth(state.claimableEth);
+     walletStatus.textContent = busy ? 'Processing' : 'Active';
+     walletStatus.className = 'text-fluor';
+   } else {
+@@ -227,133 +247,93 @@ function updateUI() {
+     walletTerminalLine.className = 'mb-8 font-mono text-sm text-white';
+     statBalance.textContent = '·';
+     statOwned.textContent = '·';
+-    statSpawnBlock.textContent = '·';
++    statClaimable.textContent = '·';
+     walletStatus.textContent = 'Idle';
+     walletStatus.className = 'text-white';
+   }
+ }
+ 
+-/**
+- * Connect wallet — stub.
+- *
+- * TODO: Replace with real Web3 provider logic:
+- *
+- *   if (!window.ethereum) throw new Error('No wallet detected');
+- *   const accounts = await window.ethereum.request({
+- *     method: 'eth_requestAccounts',
+- *   });
+- *   const provider = new ethers.BrowserProvider(window.ethereum);
+- *   const signer = await provider.getSigner();
+- *   const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+- */
+ async function connectWallet() {
+-  if (state.connected) return;
++  if (state.connected || state.claiming) return;
+ 
+   setStatus('Requesting wallet connection...', 'warn');
+   walletStatus.textContent = 'Connecting';
+ 
+   try {
+-    // Simulated delay — remove when wiring real provider
+-    await new Promise((resolve) => setTimeout(resolve, 900));
+-
+-    // TODO: const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+-    // TODO: state.hashBalance = await contract.balanceOf(accounts[0]);
+-    // TODO: state.hashesOwned = await nftContract.balanceOf(accounts[0]);
+-    const mockAddress = '0xC0FFEE' + Math.random().toString(16).slice(2, 10).padEnd(8, '0');
+-
+-    state.connected = true;
+-    state.address = mockAddress;
+-    state.hashBalance = 6240;
+-    state.hashesOwned = 2;
+-    state.spawnBlock = 19_842_103;
++    const { address, balances } = await connect();
++    applyConnection(address, balances);
++
++    if (!contractsConfigured()) {
++      setStatus('Connected. Set contract addresses in .env to read balances.', 'warn');
++    } else if (balances.claimableEth > 0) {
++      setStatus('Connected. Rewards ready to claim.', 'success');
++    } else {
++      setStatus('Connected. Wallet synced on-chain.', 'success');
++    }
+ 
+-    setStatus(`Connected. Ready to spawn ${state.quantity} $HASH.`, 'success');
+     updateUI();
+   } catch (error) {
+     console.error('[UniHash] Wallet connection failed:', error);
+-    setStatus('Connection rejected. Retry when ready.', 'error');
++    setStatus(error?.message ?? 'Connection rejected. Retry when ready.', 'error');
+     walletStatus.textContent = 'Idle';
+   }
+ }
+ 
+-/**
+- * Mint / spawn tokens — stub.
+- *
+- * TODO: Replace simulation with on-chain mint:
+- *
+- *   const tx = await contract.mint(state.address, state.quantity, {
+- *     value: parseEther(String(state.quantity * MINT_PRICE)),
+- *   });
+- *   setStatus('Transaction pending...', 'warn');
+- *   const receipt = await tx.wait();
+- *   setStatus(`Spawned ${state.quantity} $HASH at block ${receipt.blockNumber}.`, 'success');
+- */
+-async function spawnTokens() {
+-  if (!state.connected || state.minting || state.sealing) return;
+-
+-  state.minting = true;
++async function claimRewards() {
++  if (!state.connected || state.claiming || state.claimableEth <= 0) return;
++
++  state.claiming = true;
+   updateUI();
+-  setStatus(`Spawning ${state.quantity} $HASH on-chain...`, 'warn');
++  setStatus('Claiming protocol rewards...', 'warn');
+ 
+   try {
+-    // Simulated mint latency — remove when wiring contract.mint()
+-    await new Promise((resolve) => setTimeout(resolve, 2200));
+-
+-    setStatus(
+-      `Success. ${state.quantity} token${state.quantity > 1 ? 's' : ''} spawned. Tx: 0x${Math.random().toString(16).slice(2, 10)}...`,
+-      'success',
+-    );
++    const claimed = state.claimableEth;
++    await claim(state.address);
++    const balances = await refresh(state.address);
++    applyBalances(balances);
++    setStatus(`Claimed ${formatEth(claimed)} from treasury.`, 'success');
+   } catch (error) {
+-    console.error('[UniHash] Mint failed:', error);
+-    setStatus('Spawn failed. Check gas and retry.', 'error');
++    console.error('[UniHash] Claim failed:', error);
++    setStatus(error?.shortMessage ?? error?.message ?? 'Claim failed. Retry when ready.', 'error');
+   } finally {
+-    state.minting = false;
++    state.claiming = false;
+     updateUI();
+   }
+ }
+ 
+-/**
+- * Seal Hash — stub.
+- *
+- * TODO: Replace with on-chain seal call:
+- *   const tx = await nftContract.seal(tokenId);
+- *   await tx.wait();
+- */
+-async function sealHash() {
+-  if (!state.connected || state.sealing || state.hashesOwned === 0) return;
+-
+-  state.sealing = true;
++async function handleAccountChange(address) {
++  if (!address) {
++    clearConnection();
++    setStatus('Wallet disconnected.', 'neutral');
++    updateUI();
++    return;
++  }
++
++  state.refreshing = true;
+   updateUI();
+-  setStatus('Sealing Hash — freezing tokenURI on-chain...', 'warn');
+ 
+   try {
+-    await new Promise((resolve) => setTimeout(resolve, 1800));
+-    setStatus('Hash sealed. tokenURI frozen permanently.', 'success');
++    const balances = await refresh(address);
++    applyConnection(address, balances);
++    setStatus('Account switched. Balances updated.', 'success');
+   } catch (error) {
+-    console.error('[UniHash] Seal failed:', error);
+-    setStatus('Seal failed. Retry when ready.', 'error');
++    console.error('[UniHash] Refresh failed:', error);
++    setStatus('Could not refresh balances.', 'error');
+   } finally {
+-    state.sealing = false;
++    state.refreshing = false;
+     updateUI();
+   }
+ }
+ 
+-function changeQuantity(delta) {
+-  if (state.minting || state.sealing) return;
+-
+-  state.quantity = Math.min(MAX_QTY, Math.max(MIN_QTY, state.quantity + delta));
+-
+-  if (state.connected) {
+-    setStatus(`Ready to spawn ${state.quantity} $HASH.`, 'success');
+-  }
++async function tryRestoreSession() {
++  const session = await tryAutoConnect();
++  if (!session) return;
+ 
++  applyConnection(session.address, session.balances);
++  setStatus('Wallet reconnected.', 'success');
+   updateUI();
+ }
+ 
+-// ═══════════════════════════════════════════════════════════════════════════
+-// LIVE HERO STATS — animated counters (replace with on-chain reads)
+-// ═══════════════════════════════════════════════════════════════════════════
+-
+ function initHeroStats() {
+   const targets = {
+     'stat-hashes': 1284,
+@@ -381,14 +361,10 @@ function initHeroStats() {
+ function initWeb3UI() {
+   btnConnectHeader.addEventListener('click', connectWallet);
+   btnConnectWallet.addEventListener('click', connectWallet);
+-  btnSeal.addEventListener('click', sealHash);
+-  btnSpawn.addEventListener('click', spawnTokens);
+-  btnQtyMinus.addEventListener('click', () => changeQuantity(-1));
+-  btnQtyPlus.addEventListener('click', () => changeQuantity(1));
+-
+-  // TODO: Listen for account/network changes from wallet provider
+-  // window.ethereum?.on('accountsChanged', handleAccountsChanged);
+-  // window.ethereum?.on('chainChanged', () => window.location.reload());
++  btnClaim.addEventListener('click', claimRewards);
++
++  initWalletListeners(handleAccountChange);
++  tryRestoreSession();
+ 
+   initHeroStats();
+   updateUI();

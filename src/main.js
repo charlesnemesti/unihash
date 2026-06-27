@@ -1,9 +1,21 @@
 import './style.css';
-import * as THREE from 'three';
 import { createHackedTypewriter, HERO_TYPEWRITER_TEXT } from './hacked-typewriter.js';
 import { liveDataEnabled, LAUNCH_TERMINAL_MESSAGE } from './config/launch.js';
 import { initLaunchHeroStats } from './launch-terminal-stats.js';
 import { initCaStrip } from './ca-strip.js';
+import {
+  BRAND_NAME,
+  TOKEN_SYMBOL,
+  NFT_NAME_PLURAL,
+} from './config/brand.js';
+import {
+  readUnitFromChain,
+  computeHoldProgress,
+  isHoldEligible,
+  HOLDER_THRESHOLD_FALLBACK,
+  HOLDER_THRESHOLD_LABEL,
+} from './config/holder.js';
+import { createChainBrowser } from './three/pdb/chain-browser.js';
 import {
   connect,
   tryAutoConnect,
@@ -18,30 +30,19 @@ import {
   initWalletDropdown,
   readProtocolStats,
   readTokenMetadata,
-  loadSampleHashes,
   UNISWAP_BUY_URL,
   ETHERSCAN_TOKEN_URL,
 } from './web3/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// THREE.JS — HERO LANDING (animation groups)
-// Based on: three.js/examples/misc_animation_groups.html
+// THREE.JS — INTERACTIVE MOLECULAR CHAIN NFT BROWSER (hero focal point)
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** @type {THREE.Scene} */
-let heroScene;
-/** @type {THREE.PerspectiveCamera} */
-let heroCamera;
-/** @type {THREE.WebGLRenderer} */
-let heroRenderer;
-/** @type {THREE.AnimationMixer} */
-let heroMixer;
-/** @type {THREE.Clock} */
-let heroClock;
-/** @type {HTMLElement | null} */
-let heroContainer = null;
-/** @type {number | null} */
-let heroAnimationId = null;
+/** @type {ReturnType<typeof createChainBrowser> | null} */
+let chainBrowser = null;
+
+/** @type {number} */
+let holdThreshold = HOLDER_THRESHOLD_FALLBACK;
 
 /** @type {ReturnType<typeof createHackedTypewriter> | null} */
 let heroTypewriter = null;
@@ -64,132 +65,74 @@ function disposeHeroTypewriter() {
   heroTypewriter = null;
 }
 
-function initHeroAnimationGroups() {
-  heroContainer = document.getElementById('hero-canvas');
-  if (!heroContainer) return;
+function initChainBrowser() {
+  const container = document.getElementById('hero-canvas');
+  if (!container) return;
 
-  heroScene = new THREE.Scene();
-  heroScene.background = new THREE.Color(0x000000);
-
-  const gridCenter = new THREE.Vector3(0, 0, 0);
-
-  heroCamera = new THREE.PerspectiveCamera(48, 1, 1, 1000);
-  heroCamera.position.set(48, 38, 88);
-  heroCamera.lookAt(gridCenter);
-
-  heroRenderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false,
-    powerPreference: 'high-performance',
+  container.classList.add('site-bg-canvas--interactive');
+  chainBrowser = createChainBrowser({
+    stageId: 'hero-canvas',
+    panelSelector: '.lab-card',
+    ids: {
+      title: 'lab-title',
+      sub: 'lab-sub',
+      chainId: 'lab-chain-id',
+      molecule: 'lab-molecule',
+      atoms: 'lab-atoms',
+      owner: 'lab-owner',
+      rewards: 'lab-rewards',
+      pattern: 'lab-pattern',
+      progressText: 'lab-progress-text',
+      progressFill: 'lab-progress-fill',
+      kicker: 'lab-kicker',
+      hint: 'lab-hint',
+      prev: 'lab-prev',
+      next: 'lab-next',
+      shuffle: 'lab-shuffle',
+      loader: 'lab-loader',
+      loaderFill: 'lab-loader-fill',
+    },
+    brandName: BRAND_NAME,
+    tokenSymbol: TOKEN_SYMBOL,
+    holdLabel: HOLDER_THRESHOLD_LABEL,
   });
-  heroRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  heroContainer.appendChild(heroRenderer.domElement);
+}
 
-  // All meshes share one animation state via AnimationObjectGroup
-  const animationGroup = new THREE.AnimationObjectGroup();
-  const geometry = new THREE.BoxGeometry(5, 5, 5);
-  const material = new THREE.MeshBasicMaterial({
-    transparent: true,
-    color: 0x000000,
-    opacity: 0.85,
-  });
+function disposeChainBrowser() {
+  chainBrowser?.dispose();
+  chainBrowser = null;
+  document.getElementById('hero-canvas')?.classList.remove('site-bg-canvas--interactive');
+}
 
-  for (let i = 0; i < 5; i++) {
-    for (let j = 0; j < 5; j++) {
-      const mesh = new THREE.Mesh(geometry, material.clone());
-      mesh.position.x = 32 - 16 * i;
-      mesh.position.y = 0;
-      mesh.position.z = 32 - 16 * j;
-      heroScene.add(mesh);
-      animationGroup.add(mesh);
-    }
+function updateHoldVisuals(balance) {
+  const progress = computeHoldProgress(balance, holdThreshold);
+  const eligible = isHoldEligible(balance, holdThreshold);
+
+  const fill = document.getElementById('hold-progress-fill');
+  const value = document.getElementById('hold-progress-value');
+  const note = document.getElementById('hold-progress-note');
+
+  if (fill) fill.style.width = `${Math.round(progress * 100)}%`;
+
+  const held = Math.min(balance, holdThreshold);
+  if (value) {
+    value.textContent = liveDataEnabled && state.connected
+      ? `${formatNumber(held)} / ${HOLDER_THRESHOLD_LABEL}`
+      : `0 / ${HOLDER_THRESHOLD_LABEL}`;
   }
 
-  const xAxis = new THREE.Vector3(1, 0, 0);
-  const qInitial = new THREE.Quaternion().setFromAxisAngle(xAxis, 0);
-  const qFinal = new THREE.Quaternion().setFromAxisAngle(xAxis, Math.PI);
-
-  const quaternionKF = new THREE.QuaternionKeyframeTrack(
-    '.quaternion',
-    [0, 1, 2],
-    [
-      qInitial.x, qInitial.y, qInitial.z, qInitial.w,
-      qFinal.x, qFinal.y, qFinal.z, qFinal.w,
-      qInitial.x, qInitial.y, qInitial.z, qInitial.w,
-    ],
-  );
-
-  // Fluor yellow → white → black (UniHash palette)
-  const colorKF = new THREE.ColorKeyframeTrack(
-    '.material.color',
-    [0, 1, 2],
-    [
-      0.875, 1, 0,   // #DFFF00 fluor
-      1, 1, 1,       // white
-      0.05, 0.05, 0, // near-black
-    ],
-    THREE.InterpolateDiscrete,
-  );
-
-  const opacityKF = new THREE.NumberKeyframeTrack(
-    '.material.opacity',
-    [0, 1, 2],
-    [0.95, 0.35, 0.9],
-  );
-
-  const clip = new THREE.AnimationClip('unihash-hero', 3, [quaternionKF, colorKF, opacityKF]);
-
-  heroMixer = new THREE.AnimationMixer(animationGroup);
-  heroMixer.clipAction(clip).play();
-
-  heroClock = new THREE.Clock();
-
-  window.addEventListener('resize', onHeroResize);
-  onHeroResize();
-  animateHero();
-}
-
-function onHeroResize() {
-  if (!heroContainer || !heroCamera || !heroRenderer) return;
-
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const aspect = width / height;
-
-  heroCamera.aspect = aspect;
-  heroCamera.fov = aspect < 0.85 ? 54 : aspect > 1.6 ? 46 : 50;
-
-  const distance = aspect < 1 ? 102 : 92;
-  heroCamera.position.set(distance * 0.52, distance * 0.4, distance * 0.95);
-  heroCamera.lookAt(0, 0, 0);
-
-  heroCamera.updateProjectionMatrix();
-  heroRenderer.setSize(width, height, false);
-}
-
-function animateHero() {
-  heroAnimationId = requestAnimationFrame(animateHero);
-
-  const delta = heroClock.getDelta();
-  heroMixer?.update(delta);
-  heroRenderer?.render(heroScene, heroCamera);
-}
-
-function disposeHeroAnimation() {
-  if (heroAnimationId !== null) cancelAnimationFrame(heroAnimationId);
-  window.removeEventListener('resize', onHeroResize);
-
-  heroMixer?.stopAllAction();
-  heroRenderer?.dispose();
-
-  heroScene?.traverse((object) => {
-    if (object instanceof THREE.Mesh) {
-      object.geometry?.dispose();
-      object.material?.dispose();
+  if (note) {
+    note.classList.remove('is-stable', 'is-burning');
+    if (eligible) {
+      note.textContent = `Chain stable — ${NFT_NAME_PLURAL} forging on-chain`;
+      note.classList.add('is-stable');
+    } else if (balance > 0 && balance < holdThreshold) {
+      note.textContent = `Unstable — drop below ${HOLDER_THRESHOLD_LABEL} burns your Chain`;
+      note.classList.add('is-burning');
+    } else {
+      note.textContent = `Hold ${HOLDER_THRESHOLD_LABEL} ${TOKEN_SYMBOL} to forge a molecular Chain`;
     }
-  });
-
-  heroRenderer?.domElement?.remove();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -267,6 +210,7 @@ function applyBalances(balances) {
   state.hashBalance = balances.hashBalance;
   state.hashesOwned = balances.hashesOwned;
   state.claimableEth = balances.claimableEth;
+  updateHoldVisuals(state.hashBalance);
 }
 
 function applyConnection(address, balances) {
@@ -281,6 +225,7 @@ function clearConnection() {
   state.hashBalance = 0;
   state.hashesOwned = 0;
   state.claimableEth = 0;
+  updateHoldVisuals(0);
 }
 
 /** @type {ReturnType<typeof initWalletDropdown> | null} */
@@ -374,7 +319,7 @@ async function connectWithProvider(provider, rdns) {
 
     updateUI();
   } catch (error) {
-    console.error('[UniHash] Wallet connection failed:', error);
+    console.error(`[${BRAND_NAME}] Wallet connection failed:`, error);
     setStatus(formatWalletError(error), 'error');
     walletStatus.textContent = 'Idle';
   }
@@ -394,7 +339,7 @@ async function claimRewards() {
     applyBalances(balances);
     setStatus(`Claimed ${formatEth(claimed)} from treasury.`, 'success');
   } catch (error) {
-    console.error('[UniHash] Claim failed:', error);
+    console.error(`[${BRAND_NAME}] Claim failed:`, error);
     setStatus(error?.shortMessage ?? error?.message ?? 'Claim failed. Retry when ready.', 'error');
   } finally {
     state.claiming = false;
@@ -416,7 +361,7 @@ async function handleAccountChange(address) {
     applyConnection(address, balances);
     setStatus('Account switched. Balances updated.', 'success');
   } catch (error) {
-    console.error('[UniHash] Refresh failed:', error);
+    console.error(`[${BRAND_NAME}] Refresh failed:`, error);
     setStatus('Could not refresh balances.', 'error');
   } finally {
     state.refreshing = false;
@@ -456,7 +401,7 @@ async function initHeroStats() {
     animateStat('stat-holders', stats.holders);
     animateStat('stat-spawned', stats.blocksSpawned);
   } catch (error) {
-    console.error('[UniHash] Could not load protocol stats:', error);
+    console.error(`[${BRAND_NAME}] Could not load protocol stats:`, error);
     ids.forEach((id) => {
       const el = $(id);
       if (el) el.textContent = '—';
@@ -513,55 +458,14 @@ async function initTokenomics() {
     supplyEl.textContent = formatNumber(meta.totalSupply);
     if (symbolEl) symbolEl.textContent = `$${meta.symbol}`;
   } catch (error) {
-    console.error('[UniHash] Could not load token metadata:', error);
+    console.error(`[${BRAND_NAME}] Could not load token metadata:`, error);
     supplyEl.textContent = '—';
   }
 }
 
-function renderHashPreview(svgMarkup) {
-  return `<svg viewBox="0 0 24 24" class="h-full w-full">${svgMarkup}</svg>`;
-}
-
 async function initLandingOnChainContent() {
-  if (!liveDataEnabled) return;
-
-  if (!contractsConfigured()) return;
-
-  try {
-    const samples = await loadSampleHashes(15);
-    if (samples.length === 0) return;
-
-    const grid = $('landing-gallery-grid');
-    if (grid) {
-      grid.innerHTML = samples
-        .map(
-          (hash) =>
-            `<div class="gallery-cell" title="${hash.hashId}"><svg viewBox="0 0 24 24">${hash.svg}</svg></div>`,
-        )
-        .join('');
-    }
-
-    const cardsRoot = $('hash-showcase-cards');
-    if (cardsRoot) {
-      const featured = samples.slice(0, 3);
-      const cardClasses = ['hash-card hash-card--live', 'hash-card hash-card--sealed', 'hash-card hash-card--live'];
-
-      cardsRoot.innerHTML = featured
-        .map(
-          (hash, index) => `
-          <article class="${cardClasses[index] ?? 'hash-card hash-card--live'}">
-            <div class="hash-preview" aria-hidden="true">${renderHashPreview(hash.svg)}</div>
-            <div>
-              <p class="hash-name">hash_${hash.hashId.slice(1)}</p>
-              <p class="hash-status hash-status--active">Live · ${hash.ownerShort}</p>
-            </div>
-          </article>`,
-        )
-        .join('');
-    }
-  } catch (error) {
-    console.error('[UniHash] Could not load landing on-chain previews:', error);
-  }
+  // The landing page now uses static 3D molecular collection graphics.
+  // Live owned Chains are surfaced by the hero Chain browser and wallet panel.
 }
 
 function initWeb3UI() {
@@ -605,19 +509,27 @@ function initWeb3UI() {
   updateUI();
 }
 
+async function initHoldThreshold() {
+  if (contractsConfigured() && liveDataEnabled) {
+    holdThreshold = await readUnitFromChain();
+  }
+  updateHoldVisuals(state.hashBalance);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════════════════════
 
-initHeroAnimationGroups();
+initChainBrowser();
 initHeroTypewriter();
 initCaStrip();
+initHoldThreshold();
 initWeb3UI();
 
 // Optional cleanup if hot-reloaded in dev
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    disposeHeroAnimation();
+    disposeChainBrowser();
     disposeHeroTypewriter();
   });
 }

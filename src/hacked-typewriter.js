@@ -191,5 +191,4 @@ function escapeHtml(char) {
     .replace(/"/g, '&quot;');
 }
 
-export const HERO_TYPEWRITER_TEXT =
-  'Hold $HASH and spawn living NFTs\nrendered fully on-chain';
+export { HERO_TYPEWRITER_TEXT } from './config/brand.js';

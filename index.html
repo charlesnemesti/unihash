@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="UniHash — Hold $HASH, spawn 100% on-chain SVG NFTs. EVM-native renderer & Base64 core."
+      content="UniChain — Hold 200 $HASH to forge living molecular Chain NFTs on Ethereum. Interactive 3D PDB lab, on-chain rewards."
     />
-    <title>UniHash · $HASH · 100% On-Chain SVG Art</title>
+    <title>UniChain · $HASH · Molecular Chains On-Chain</title>
     <link rel="icon" href="/logo.svg" type="image/svg+xml" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,17 +27,20 @@
 
       <!-- ═══ HEADER / NAV ═══ -->
       <header class="site-header-glass fixed top-0 left-0 right-0 z-50 border-b border-ui">
-        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 md:px-10">
-          <a href="#" class="site-logo shrink-0">
-            <img src="/logo.svg" alt="" width="36" height="36" class="site-logo-mark" aria-hidden="true" />
-            <span class="site-logo-text">UniHash <span class="text-fluor">$HASH</span></span>
-          </a>
+        <div class="flex w-full items-center justify-between gap-4 px-4 py-4 md:px-8 xl:px-12">
+          <div class="flex shrink-0 items-center gap-3">
+            <a href="#" class="site-logo shrink-0">
+              <img src="/logo.svg" alt="" width="36" height="36" class="site-logo-mark" aria-hidden="true" />
+              <span class="site-logo-text"><span class="text-fluor-red">UNI</span><span class="text-fluor">CHAIN</span></span>
+            </a>
+            <a href="#wallet" class="btn-primary buy-hash-link hidden sm:inline-flex">Buy $CHAIN ↗</a>
+          </div>
 
           <nav class="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
+            <a href="#hero" class="nav-link">Lab</a>
             <a href="#how-it-works" class="nav-link">How it works</a>
-            <a href="#the-hash" class="nav-link">Hashes</a>
+            <a href="#the-hash" class="nav-link">Chains</a>
             <a href="#tokenomics" class="nav-link">Tokenomics</a>
-            <a href="gallery.html" class="nav-link">Gallery</a>
             <a href="whitepaper.html" class="nav-link">Whitepaper</a>
           </nav>
 
@@ -47,13 +50,12 @@
               class="btn-twitter"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Follow UniHash on X"
+              aria-label="Follow UniChain on X"
             >
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
-            <a href="#wallet" class="btn-primary buy-hash-link hidden sm:inline-flex">Buy $HASH ↗</a>
             <div id="wallet-dropdown-header" class="wallet-dropdown">
               <button
                 id="btn-connect-header"
@@ -79,70 +81,123 @@
         </div>
 
         <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ui px-6 py-3 lg:hidden" aria-label="Mobile navigation">
-          <a href="#wallet" class="btn-primary buy-hash-link text-[10px] sm:hidden">Buy $HASH ↗</a>
+          <a href="#wallet" class="btn-primary buy-hash-link text-[10px] sm:hidden">Buy $CHAIN ↗</a>
+          <a href="#hero" class="nav-link text-xs">Lab</a>
           <a href="#how-it-works" class="nav-link text-xs">How it works</a>
-          <a href="#the-hash" class="nav-link text-xs">Hashes</a>
+          <a href="#the-hash" class="nav-link text-xs">Chains</a>
           <a href="#tokenomics" class="nav-link text-xs">Tokenomics</a>
-          <a href="gallery.html" class="nav-link text-xs">Gallery</a>
           <a href="whitepaper.html" class="nav-link text-xs">Whitepaper</a>
         </nav>
 
-        <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
-          <div class="ca-strip-glow" aria-hidden="true"></div>
-          <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-2.5 md:px-10">
-            <div class="ca-strip-meta">
-              <p class="ca-strip-label">&gt; contract_address · $HASH</p>
-              <code class="ca-strip-address" id="ca-address-display" title="UniHash token contract"></code>
-            </div>
-            <div class="ca-strip-actions">
-              <a
-                id="ca-explorer-link"
-                href="#"
-                class="ca-strip-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan ↗
-              </a>
-              <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
-            </div>
-          </div>
-        </div>
       </header>
 
       <main class="site-main">
 
-        <!-- ═══ HERO LANDING (fullscreen + animation groups) ═══ -->
-        <section id="hero" class="hero-landing" aria-labelledby="hero-heading">
-          <div class="hero-content mx-auto w-full max-w-6xl px-6 md:px-10">
-            <p class="hero-eyebrow">A living registry on Ethereum EVM</p>
-
+        <!-- ═══ HERO · INTERACTIVE MOLECULAR CHAIN NFT LAB ═══ -->
+        <section id="hero" class="lab-hero" aria-labelledby="hero-heading">
+          <div class="lab-hero-grid">
             <h1
               id="hero-heading"
-              class="hero-title"
-              aria-label="Hold $HASH and spawn living NFTs rendered fully on-chain"
+              class="lab-hero-title"
+              aria-label="Hold 200 HASH tokens to forge living on-chain molecular Chain NFTs"
             >
               <span id="hero-typewriter" class="hero-typewriter"></span>
             </h1>
 
-            <a href="gallery.html" class="btn-gallery-cta">
-              <span class="btn-gallery-cta-glow" aria-hidden="true"></span>
-              <span class="btn-gallery-cta-label">Visit the SVG gallery ↗</span>
-            </a>
-          </div>
+            <!-- LEFT · title + subtitle + live NFT presenter -->
+            <div class="lab-hero-left">
+              <p class="hero-eyebrow" id="lab-kicker">Molecular registry on Ethereum EVM</p>
 
-          <div class="hero-bottom">
-            <div class="hero-stats font-mono text-xs uppercase tracking-widest text-white">
-              <div class="hero-stats-metrics">
-                <span><span class="hero-stat-num" id="stat-hashes">·</span> Hashes alive</span>
-                <span><span class="hero-stat-num" id="stat-holders">·</span> holders</span>
-                <span><span class="hero-stat-num" id="stat-spawned">·</span> blocks spawned</span>
+              <p class="lab-hero-sub" id="lab-sub">
+                Explore the living molecular Chain NFTs — 10 on-chain structures × 10 color patterns,
+                each forged by holding 200 $HASH.
+              </p>
+
+              <div class="lab-card">
+                <div class="lab-card-head">
+                  <span class="lab-card-id accent-blue" id="lab-chain-id">#0001</span>
+                  <span class="lab-card-name" id="lab-title">Chain #0001</span>
+                </div>
+
+                <div class="lab-spec-grid">
+                  <div class="lab-spec">
+                    <span class="lab-spec-label">Molecule</span>
+                    <span class="lab-spec-value" id="lab-molecule">—</span>
+                  </div>
+                  <div class="lab-spec">
+                    <span class="lab-spec-label">Atoms</span>
+                    <span class="lab-spec-value" id="lab-atoms">—</span>
+                  </div>
+                  <div class="lab-spec">
+                    <span class="lab-spec-label">Owner</span>
+                    <span class="lab-spec-value" id="lab-owner">—</span>
+                  </div>
+                  <div class="lab-spec">
+                    <span class="lab-spec-label">Rewards</span>
+                    <span class="lab-spec-value accent-red" id="lab-rewards">—</span>
+                  </div>
+                  <div class="lab-spec lab-spec--wide">
+                    <span class="lab-spec-label">Color pattern</span>
+                    <span class="lab-spec-value" id="lab-pattern">—</span>
+                  </div>
+                </div>
+
+                <div class="lab-controls">
+                  <button type="button" class="lab-btn" id="lab-prev" aria-label="Previous unit">← Prev</button>
+                  <button type="button" class="lab-btn lab-btn--primary" id="lab-shuffle" aria-label="Randomize structure and colors">Randomize ↻</button>
+                  <button type="button" class="lab-btn" id="lab-next" aria-label="Next unit">Next →</button>
+                </div>
+
+                <div class="lab-progress">
+                  <div class="lab-progress-track"><div class="lab-progress-fill" id="lab-progress-fill"></div></div>
+                  <p class="lab-progress-text" id="lab-progress-text">1 / 100</p>
+                </div>
+
+                <p class="lab-hint" id="lab-hint"></p>
               </div>
-              <p id="hero-stats-launch" class="hero-stats-launch" aria-live="polite"></p>
+
+              <div class="hold-progress" aria-label="Hold progress toward 200 tokens">
+                <div class="hold-progress-label">
+                  <span>Chain valence</span>
+                  <strong id="hold-progress-value">0 / 200</strong>
+                </div>
+                <div class="hold-progress-track">
+                  <div class="hold-progress-fill" id="hold-progress-fill"></div>
+                </div>
+                <p class="hold-progress-note" id="hold-progress-note">
+                  Hold 200 $HASH to forge a molecular Chain
+                </p>
+              </div>
             </div>
 
-            <a href="#how-it-works" class="scroll-hint" aria-label="Scroll down">Scroll</a>
+            <!-- RIGHT · section menu -->
+            <aside class="lab-hero-menu" aria-label="Explore the protocol">
+              <p class="lab-menu-label">// explore</p>
+              <nav class="lab-menu-nav">
+                <a href="#how-it-works"><span class="lab-menu-index">01</span> How it works</a>
+                <a href="#the-hash"><span class="lab-menu-index">02</span> The Chain</a>
+                <a href="#tokenomics"><span class="lab-menu-index">03</span> Tokenomics</a>
+                <a href="#gallery"><span class="lab-menu-index">04</span> On-chain art</a>
+                <a href="#wallet"><span class="lab-menu-index">05</span> Your wallet</a>
+                <a href="whitepaper.html"><span class="lab-menu-index">06</span> Whitepaper</a>
+              </nav>
+
+              <div class="lab-menu-stats">
+                <span><strong class="hero-stat-num" id="stat-hashes">·</strong> Chains alive</span>
+                <span><strong class="hero-stat-num" id="stat-holders">·</strong> holders</span>
+                <span><strong class="hero-stat-num" id="stat-spawned">·</strong> blocks spawned</span>
+                <p id="hero-stats-launch" class="hero-stats-launch" aria-live="polite"></p>
+              </div>
+
+              <a href="#wallet" class="btn-primary buy-hash-link lab-menu-buy">Buy $HASH ↗</a>
+            </aside>
           </div>
+
+          <div id="lab-loader" class="lab-loader" aria-hidden="true">
+            <div class="lab-loader-bar"><span id="lab-loader-fill"></span></div>
+          </div>
+
+          <a href="#how-it-works" class="scroll-hint lab-scroll-hint" aria-label="Scroll down">Scroll</a>
         </section>
 
         <!-- ═══ HOW IT WORKS ═══ -->
@@ -150,13 +205,13 @@
           <div class="mx-auto max-w-6xl px-6 md:px-10">
             <p class="section-label">How it works</p>
             <h2 id="how-heading" class="section-title mb-8">
-              Buy the token and a Hash appears, drawn on-chain
+              Buy the token — a molecular Chain forges itself on-chain
             </h2>
 
             <p class="body-text mb-16 max-w-3xl md:text-base">
-              You buy $HASH on Uniswap the way you would any coin, and once you hold 1 whole token a living
-              Hash NFT mints itself straight to your wallet — 24×24 SVG art and all. Every Hash is drawn by
-              contracts on Ethereum, with no server, no IPFS, and no mint page to visit.
+              You buy $HASH on Uniswap like any coin. Hold 200 whole tokens and a living Chain NFT
+              mints straight to your wallet as a unique 3D molecular Chain. Every atom and bond in the
+              lab comes from one of the curated PDB structures. No procedural fake geometry, no mint page.
             </p>
 
             <div class="grid gap-8 md:grid-cols-3">
@@ -171,10 +226,10 @@
 
               <article class="step-card">
                 <span class="step-number">02</span>
-                <h3 class="step-title">Hold 1, get a Hash</h3>
+                <h3 class="step-title">Hold 200, get a Chain</h3>
                 <p class="step-body">
-                  Hold 1 whole $HASH and a living Hash appears in your wallet. Each additional whole token
-                  spawns another. Drop below 1 and the NFT burns automatically.
+                  Hold 200 whole $HASH and a living Chain appears in your wallet. Each additional 200
+                  forges another. Drop below 200.00 and the NFT burns automatically.
                 </p>
               </article>
 
@@ -182,7 +237,7 @@
                 <span class="step-number">03</span>
                 <h3 class="step-title">Claim your share</h3>
                 <p class="step-body">
-                  Each Hash accrues protocol fees from the 4% swap tax. Rewards build in the background
+                  Each Chain accrues protocol fees from the 4% swap tax. Rewards build over time
                   and you claim them whenever you want — no staking, no lockups.
                 </p>
               </article>
@@ -193,50 +248,85 @@
         <!-- ═══ THE HASH ═══ -->
         <section id="the-hash" class="section-pad border-b border-ui" aria-labelledby="hash-heading">
           <div class="mx-auto max-w-6xl px-6 md:px-10">
-            <p class="section-label">The Hash</p>
+            <p class="section-label">The Chain</p>
             <h2 id="hash-heading" class="section-title mb-4">
-              A living NFT, drawn fully on-chain
+              Unique 3D molecular Chain NFTs
             </h2>
             <p class="body-text mb-12 max-w-3xl">
-              Every Hash is drawn by contracts on Ethereum rather than a server, and its look is read from
-              the chain, so it shifts as you hold and seal it. Sealing one locks it for good and preserves
-              the <span class="text-fluor">frozen tokenURI</span> permanently on-chain.
+              Every Chain is built from a real molecular PDB structure and rendered as an interactive
+              ball-and-stick 3D model. The NFT identity comes from the molecule base plus its color pattern:
+              structure changes the chemistry, colors change the visual fingerprint.
             </p>
 
             <div id="hash-showcase-cards" class="mb-10 grid gap-4 md:grid-cols-3">
-              <article class="hash-card hash-card--live">
-                <div class="hash-preview" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" class="h-full w-full"><rect width="24" height="24" fill="#000"/><rect x="4" y="4" width="4" height="4" fill="#DFFF00"/><rect x="12" y="8" width="4" height="4" fill="#DFFF00"/><rect x="8" y="16" width="8" height="4" fill="#DFFF00"/></svg>
+              <article class="molecule-card molecule-card--cyan">
+                <div class="molecule-card-graphic" aria-hidden="true">
+                  <svg viewBox="0 0 96 96">
+                    <line x1="24" y1="56" x2="48" y2="34" />
+                    <line x1="48" y1="34" x2="70" y2="52" />
+                    <line x1="48" y1="34" x2="48" y2="68" />
+                    <circle cx="24" cy="56" r="12" />
+                    <circle cx="48" cy="34" r="15" />
+                    <circle cx="70" cy="52" r="10" />
+                    <circle cx="48" cy="68" r="8" />
+                  </svg>
                 </div>
                 <div>
-                  <p class="hash-name">genesis_subnet#0001</p>
-                  <p class="hash-status hash-status--active">Live · objectURI</p>
+                  <p class="molecule-card-kicker">Base structure</p>
+                  <h3 class="molecule-card-title">10 real molecules</h3>
+                  <p class="molecule-card-body">Ethanol, caffeine, nicotine, glucose, cubane, buckyball and more.</p>
                 </div>
               </article>
 
-              <article class="hash-card hash-card--sealed">
-                <div class="hash-preview" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" class="h-full w-full"><rect width="24" height="24" fill="#000"/><rect x="2" y="2" width="20" height="20" fill="none" stroke="#DFFF00" stroke-width="1"/><rect x="6" y="6" width="12" height="12" fill="#DFFF00" opacity="0.6"/></svg>
+              <article class="molecule-card molecule-card--red">
+                <div class="molecule-card-graphic" aria-hidden="true">
+                  <svg viewBox="0 0 96 96">
+                    <line x1="22" y1="30" x2="48" y2="48" />
+                    <line x1="48" y1="48" x2="74" y2="30" />
+                    <line x1="48" y1="48" x2="74" y2="68" />
+                    <line x1="48" y1="48" x2="22" y2="68" />
+                    <circle cx="22" cy="30" r="9" />
+                    <circle cx="48" cy="48" r="16" />
+                    <circle cx="74" cy="30" r="11" />
+                    <circle cx="74" cy="68" r="10" />
+                    <circle cx="22" cy="68" r="8" />
+                  </svg>
                 </div>
                 <div>
-                  <p class="hash-name">cipher_block#0042</p>
-                  <p class="hash-status hash-status--active">Sealed · frozen tokenURI</p>
+                  <p class="molecule-card-kicker">Visual fingerprint</p>
+                  <h3 class="molecule-card-title">10 color patterns</h3>
+                  <p class="molecule-card-body">Atoms keep their PDB positions; only the ball colors rotate by pattern.</p>
                 </div>
               </article>
 
-              <article class="hash-card hash-card--dormant">
-                <div class="hash-preview hash-preview--dim" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" class="h-full w-full"><rect width="24" height="24" fill="#000"/><rect x="10" y="10" width="4" height="4" fill="#DFFF00" opacity="0.25"/></svg>
+              <article class="molecule-card molecule-card--violet">
+                <div class="molecule-card-graphic" aria-hidden="true">
+                  <svg viewBox="0 0 96 96">
+                    <line x1="28" y1="26" x2="68" y2="26" />
+                    <line x1="68" y1="26" x2="78" y2="58" />
+                    <line x1="78" y1="58" x2="48" y2="78" />
+                    <line x1="48" y1="78" x2="18" y2="58" />
+                    <line x1="18" y1="58" x2="28" y2="26" />
+                    <line x1="28" y1="26" x2="48" y2="50" />
+                    <line x1="68" y1="26" x2="48" y2="50" />
+                    <circle cx="28" cy="26" r="10" />
+                    <circle cx="68" cy="26" r="10" />
+                    <circle cx="78" cy="58" r="9" />
+                    <circle cx="48" cy="78" r="12" />
+                    <circle cx="18" cy="58" r="9" />
+                    <circle cx="48" cy="50" r="7" />
+                  </svg>
                 </div>
                 <div>
-                  <p class="hash-name">null_hash#0000</p>
-                  <p class="hash-status text-white">Burned · below 1 $HASH</p>
+                  <p class="molecule-card-kicker">Collection logic</p>
+                  <h3 class="molecule-card-title">100 unique units</h3>
+                  <p class="molecule-card-body">Each NFT maps to one structure and one color pattern in the 3D lab.</p>
                 </div>
               </article>
             </div>
 
             <div class="flex flex-wrap gap-6 font-mono text-xs uppercase tracking-widest">
-              <a href="gallery.html" class="link-fluor">View your Hashes →</a>
+              <a href="#hero" class="link-fluor">View your Chains →</a>
               <a href="#" class="link-muted" target="_blank" rel="noopener noreferrer">OpenSea collection ↗</a>
             </div>
           </div>
@@ -259,8 +349,8 @@
 
             <div class="grid gap-4 md:grid-cols-2">
               <div class="stat-cell">
-                <p class="stat-cell-label">1 Hash per</p>
-                <p class="stat-cell-value">1 $HASH</p>
+                <p class="stat-cell-label">1 Chain per</p>
+                <p class="stat-cell-value">200 $HASH</p>
               </div>
               <div class="stat-cell">
                 <p class="stat-cell-label">Max per buy</p>
@@ -277,8 +367,8 @@
             </div>
 
             <p class="body-text mt-8 max-w-3xl">
-              That 4% fee funds the protocol treasury and streams back to Hash holders by weight. A sealed
-              Hash can earn up to 2.5× more over time. The full mechanics live in the
+              That 4% fee funds the protocol treasury and streams back to Chain holders by weight. A sealed
+              Chain can earn up to 2.5× more over time. The full mechanics live in the
               <a href="whitepaper.html" class="link-fluor">whitepaper</a>.
             </p>
           </div>
@@ -287,29 +377,58 @@
         <!-- ═══ GALLERY ═══ -->
         <section id="gallery" class="section-pad border-b border-ui" aria-labelledby="gallery-heading">
           <div class="mx-auto max-w-6xl px-6 md:px-10">
-            <p class="section-label">Gallery</p>
-            <h2 id="gallery-heading" class="section-title mb-6">On-chain SVG grid</h2>
+            <p class="section-label">Molecule index</p>
+            <h2 id="gallery-heading" class="section-title mb-6">10 structures × 10 color patterns</h2>
             <p class="body-text mb-10 max-w-2xl">
-              Every pixel is contract-rendered. Connect your wallet to see your live holdings, or explore
-              the full 3D collection.
+              The collection is built as a controlled molecular catalog: fixed PDB geometry, randomized
+              color identity. No procedural shapes, no fake chains — every preview points back to a real
+              3D molecule in the lab.
             </p>
 
-            <div id="landing-gallery-grid" class="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12">
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="2" y="2" width="6" height="6" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="8" y="4" width="8" height="4" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="4" y="8" width="4" height="8" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="12" y="12" width="8" height="8" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="0" y="16" width="24" height="4" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="10" y="0" width="4" height="24" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="6" y="6" width="12" height="12" fill="none" stroke="#DFFF00" stroke-width="1"/></svg></div>
-              <div class="gallery-cell"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="2" y="10" width="20" height="4" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell hidden sm:block"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="4" y="4" width="16" height="16" fill="#DFFF00" opacity="0.5"/></svg></div>
-              <div class="gallery-cell hidden sm:block"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="8" y="2" width="8" height="20" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell hidden md:block"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="0" y="0" width="12" height="12" fill="#DFFF00"/><rect x="12" y="12" width="12" height="12" fill="#DFFF00"/></svg></div>
-              <div class="gallery-cell hidden md:block"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#000"/><rect x="6" y="6" width="4" height="4" fill="#DFFF00"/><rect x="14" y="14" width="4" height="4" fill="#DFFF00"/></svg></div>
+            <div id="landing-gallery-grid" class="molecule-index-grid">
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/ethanol.png" alt="Ethanol mother molecule" loading="lazy" />
+                <figcaption>Ethanol</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/aspirin.png" alt="Aspirin mother molecule" loading="lazy" />
+                <figcaption>Aspirin</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/caffeine.png" alt="Caffeine mother molecule" loading="lazy" />
+                <figcaption>Caffeine</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/nicotine.png" alt="Nicotine mother molecule" loading="lazy" />
+                <figcaption>Nicotine</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/lsd.png" alt="LSD mother molecule" loading="lazy" />
+                <figcaption>LSD</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/cocaine.png" alt="Cocaine mother molecule" loading="lazy" />
+                <figcaption>Cocaine</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/cholesterol.png" alt="Cholesterol mother molecule" loading="lazy" />
+                <figcaption>Cholesterol</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/glucose.png" alt="Glucose mother molecule" loading="lazy" />
+                <figcaption>Glucose</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/cubane.png" alt="Cubane mother molecule" loading="lazy" />
+                <figcaption>Cubane</figcaption>
+              </figure>
+              <figure class="molecule-index-cell">
+                <img src="/images/molecules/buckyball.png" alt="Buckyball mother molecule" loading="lazy" />
+                <figcaption>Buckyball</figcaption>
+              </figure>
             </div>
 
-            <a href="gallery.html" class="btn-secondary mt-10 inline-flex">Open 3D gallery ↗</a>
+            <a href="#hero" class="btn-secondary mt-10 inline-flex">Back to the molecular lab ↑</a>
           </div>
         </section>
 
@@ -317,32 +436,32 @@
         <section id="whitepaper" class="section-pad border-b border-ui" aria-labelledby="whitepaper-heading">
           <div class="mx-auto max-w-6xl px-6 md:px-10">
             <p class="section-label">Whitepaper</p>
-            <h2 id="whitepaper-heading" class="section-title mb-6">unihash_architecture</h2>
+            <h2 id="whitepaper-heading" class="section-title mb-6">unichain_architecture</h2>
 
             <div class="panel-box">
               <p class="label-text mb-2">// protocol_manifest</p>
-              <p class="body-text mb-6">EVM-Native SVG Renderer &amp; Base64 Core</p>
+              <p class="body-text mb-6">3D Molecular Chain NFT Renderer &amp; Holder Logic</p>
 
               <ul class="mb-8 space-y-3 font-mono text-sm text-white">
                 <li class="flex items-start gap-3">
                   <span class="bullet-square" aria-hidden="true"></span>
-                  <span>24×24 SVG art + base64 JSON embedded in contract bytecode</span>
+                  <span>Real PDB molecular bases rendered as interactive Three.js ball-and-stick models</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="bullet-square" aria-hidden="true"></span>
-                  <span>Live objectURI / frozen tokenURI state machine</span>
+                  <span>10 fixed structures × 10 color patterns = 100 unique Chain NFT units</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="bullet-square" aria-hidden="true"></span>
-                  <span>Spawn block metadata written at mint time</span>
+                  <span>Randomization affects color only; atom and bond positions stay true to the molecule</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="bullet-square" aria-hidden="true"></span>
-                  <span>Whole-token mint: 1 $HASH = 1 living Hash NFT · below 1 burns</span>
+                  <span>Whole-token mint: 200 $HASH = 1 living Chain NFT · below 200 burns</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="bullet-square" aria-hidden="true"></span>
-                  <span>Zero off-chain dependencies — verifiable on Etherscan</span>
+                  <span>Wallet-owned Chains can be explored directly in the molecular lab</span>
                 </li>
               </ul>
 
@@ -355,16 +474,16 @@
         <section id="wallet" class="section-pad" aria-labelledby="wallet-heading">
           <div class="mx-auto max-w-6xl px-6 md:px-10">
             <p class="section-label">Your wallet</p>
-            <h2 id="wallet-heading" class="section-title mb-6">See your Hashes and claim your rewards</h2>
+            <h2 id="wallet-heading" class="section-title mb-6">See your Chains and claim your rewards</h2>
             <p class="body-text mb-10 max-w-2xl">
-              Connect a wallet to read your live holdings, and head to the gallery to see every Hash you own.
+              Connect a wallet to read your live holdings, and head to the molecular lab to see every Chain you own.
             </p>
 
             <div class="mx-auto max-w-xl">
               <div class="wallet-panel">
                 <div class="wallet-panel-brand mb-6">
                   <img src="/logo.svg" alt="" width="24" height="24" class="site-logo-mark" aria-hidden="true" />
-                  <p class="label-text">unihash · wallet</p>
+                  <p class="label-text">unichain · wallet</p>
                 </div>
 
                 <p id="wallet-terminal-line" class="mb-8 font-mono text-sm text-white">
@@ -377,7 +496,7 @@
                     <dd id="stat-balance">·</dd>
                   </div>
                   <div class="wallet-stat-row">
-                    <dt>Hashes</dt>
+                    <dt>Chains</dt>
                     <dd id="stat-owned">·</dd>
                   </div>
                   <div class="wallet-stat-row">
@@ -432,27 +551,49 @@
             <div>
               <a href="#" class="site-logo mb-3">
                 <img src="/logo.svg" alt="" width="32" height="32" class="site-logo-mark" aria-hidden="true" />
-                <span class="site-logo-text text-2xl">uniHash</span>
+                <span class="site-logo-text text-2xl">Uni<span class="text-fluor">Chain</span></span>
               </a>
               <p class="max-w-sm font-mono text-xs leading-relaxed text-white">
-                A coin you hold to spawn living on-chain SVG art — 1 whole $HASH mints 1 Hash NFT. Drop below
-                1 and it burns. Fully verifiable on Ethereum. Nothing here is financial advice.
+                A token you hold to stabilize molecular Chains — 200 whole $HASH forges one living NFT.
+                Drop below 200 and it burns. Fully verifiable on Ethereum. Nothing here is financial advice.
               </p>
             </div>
 
             <nav class="flex flex-wrap gap-x-8 gap-y-3 font-mono text-xs uppercase tracking-widest" aria-label="Footer navigation">
               <a href="whitepaper.html" class="link-muted">Whitepaper</a>
-              <a href="gallery.html" class="link-muted">Gallery</a>
+              <a href="#hero" class="link-muted">Lab</a>
               <a href="#" class="link-muted" target="_blank" rel="noopener noreferrer">OpenSea</a>
               <a href="https://x.com/Unihash_" class="link-muted" target="_blank" rel="noopener noreferrer">X ↗</a>
             </nav>
           </div>
 
           <p class="border-t border-ui pt-6 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-fluor">
-            © 2026 UniHash · on-chain &amp; verifiable · $HASH
+            © 2026 UniChain · on-chain &amp; verifiable · $HASH
           </p>
         </div>
       </footer>
+
+      <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
+        <div class="ca-strip-glow" aria-hidden="true"></div>
+        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-2.5 md:px-10">
+          <div class="ca-strip-meta">
+            <p class="ca-strip-label">&gt; contract_address · $HASH</p>
+            <code class="ca-strip-address" id="ca-address-display" title="UniChain token contract"></code>
+          </div>
+          <div class="ca-strip-actions">
+            <a
+              id="ca-explorer-link"
+              href="#"
+              class="ca-strip-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan ↗
+            </a>
+            <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -463,7 +604,7 @@
         <div class="wallet-modal-header">
           <div class="wallet-modal-brand">
             <img src="/logo.svg" alt="" width="24" height="24" class="site-logo-mark" aria-hidden="true" />
-            <p class="label-text">unihash · connect</p>
+            <p class="label-text">unichain · connect</p>
           </div>
           <button id="wallet-modal-close" type="button" class="wallet-modal-close" aria-label="Close">×</button>
         </div>

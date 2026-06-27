@@ -5,94 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="UniHash Gallery — explore 100% on-chain 24×24 Hash SVGs in an interactive 3D grid."
+      content="UniChain Molecular Lab — professional 3D presentation of on-chain Chain NFTs with animated molecular morphing."
     />
-    <title>UniHash Gallery · $HASH</title>
+    <title>UniChain Lab · Molecular Chain Gallery</title>
     <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Space+Mono:wght@400;700&family=VT323&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
-  <body class="gallery-page">
-    <div class="gallery-top-shell">
-    <header class="gallery-header">
-      <a href="/" class="gallery-header-brand">
-        <img src="/logo.svg" alt="" width="32" height="32" aria-hidden="true" />
-        <p class="gallery-header-title">UniHash Gallery</p>
-      </a>
-      <nav class="gallery-header-nav" aria-label="Gallery navigation">
-        <a href="/">Home</a>
-        <a href="/#wallet">Wallet</a>
-        <a href="/whitepaper.html">Whitepaper</a>
-        <a
-          href="https://x.com/Unihash_"
-          class="btn-twitter"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Follow UniHash on X"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-          </svg>
+  <body class="mol-lab-page">
+    <div class="mol-lab-top">
+      <header class="mol-lab-header">
+        <a href="/" class="mol-lab-brand">
+          <img src="/logo.svg" alt="" width="32" height="32" aria-hidden="true" />
+          <span class="mol-lab-brand-text">Uni<span class="accent-blue">Chain</span> Lab</span>
         </a>
-      </nav>
-    </header>
+        <nav class="mol-lab-nav" aria-label="Lab navigation">
+          <a href="/">Home</a>
+          <a href="/#wallet">Wallet</a>
+          <a href="/whitepaper.html">Whitepaper</a>
+        </nav>
+      </header>
 
-    <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
-      <div class="ca-strip-glow" aria-hidden="true"></div>
-      <div class="ca-strip-inner">
-        <div class="ca-strip-meta">
-          <p class="ca-strip-label">&gt; contract_address · $HASH</p>
-          <code class="ca-strip-address" id="ca-address-display" title="UniHash token contract"></code>
-        </div>
-        <div class="ca-strip-actions">
-          <a id="ca-explorer-link" href="#" class="ca-strip-link" target="_blank" rel="noopener noreferrer">
-            Etherscan ↗
-          </a>
-          <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
+      <div class="ca-strip" id="ca-strip" aria-label="Token contract address">
+        <div class="ca-strip-glow" aria-hidden="true"></div>
+        <div class="ca-strip-inner">
+          <div class="ca-strip-meta">
+            <p class="ca-strip-label">&gt; contract_address · $HASH</p>
+            <code class="ca-strip-address" id="ca-address-display" title="UniChain token contract"></code>
+          </div>
+          <div class="ca-strip-actions">
+            <a id="ca-explorer-link" href="#" class="ca-strip-link" target="_blank" rel="noopener noreferrer">Etherscan ↗</a>
+            <button type="button" class="ca-copy-btn" id="ca-copy-btn">Copy CA</button>
+          </div>
         </div>
       </div>
     </div>
-    </div>
 
-    <div class="gallery-intro">
-      <p class="gallery-intro-label">Gallery</p>
-      <h1 class="gallery-intro-title">On-chain SVG grid</h1>
-      <p class="gallery-intro-copy" id="gallery-intro-copy">
-        120 preview Hashes rendered as living 24×24 SVG art. Drag to explore, then switch layouts below.
-      </p>
-      <p class="gallery-intro-note" id="gallery-intro-note">
-        Preview mode — live on-chain data unlocks after launch.
-      </p>
-    </div>
+    <div id="mol-stage" class="mol-stage" aria-hidden="true"></div>
+    <div class="mol-stage-vignette" aria-hidden="true"></div>
 
-    <div class="gallery-showcase" aria-live="polite">
-      <p class="gallery-showcase-label" id="gallery-showcase-label">Preview pattern</p>
-      <div class="gallery-showcase-frame" id="gallery-showcase-frame">
-        <svg id="gallery-showcase-svg" viewBox="0 0 24 24" role="img" aria-label="Animated Hash pattern preview"></svg>
-      </div>
+    <main class="mol-lab-ui">
+      <section class="mol-presenter" aria-live="polite">
+        <p class="mol-presenter-kicker" id="mol-kicker">Molecular Chain NFT</p>
+        <h1 class="mol-presenter-title" id="mol-title">Chain #0001</h1>
+        <p class="mol-presenter-sub" id="mol-sub">Real PDB structure · randomized atom color pattern</p>
 
-      <dl class="gallery-showcase-details" id="gallery-showcase-details">
-        <div class="gallery-showcase-detail">
-          <dt>Hash ID</dt>
-          <dd id="gallery-showcase-hashid">#0000</dd>
+        <div class="mol-spec-grid">
+          <div class="mol-spec">
+            <span class="mol-spec-label">Chain ID</span>
+            <span class="mol-spec-value accent-blue" id="mol-chain-id">—</span>
+          </div>
+          <div class="mol-spec">
+            <span class="mol-spec-label">Molecule</span>
+            <span class="mol-spec-value" id="mol-layout">—</span>
+          </div>
+          <div class="mol-spec">
+            <span class="mol-spec-label">Atoms</span>
+            <span class="mol-spec-value" id="mol-atoms">—</span>
+          </div>
+          <div class="mol-spec">
+            <span class="mol-spec-label">Owner</span>
+            <span class="mol-spec-value" id="mol-owner">—</span>
+          </div>
+          <div class="mol-spec">
+            <span class="mol-spec-label">Rewards</span>
+            <span class="mol-spec-value accent-red" id="mol-rewards">—</span>
+          </div>
+          <div class="mol-spec">
+            <span class="mol-spec-label">Design</span>
+            <span class="mol-spec-value mono" id="mol-seed">—</span>
+          </div>
         </div>
-        <div class="gallery-showcase-detail">
-          <dt>Owner wallet</dt>
-          <dd id="gallery-showcase-owner">0x0000…0000</dd>
-        </div>
-        <div class="gallery-showcase-detail">
-          <dt>Daily yield</dt>
-          <dd id="gallery-showcase-yield">~0.000 $HASH / day</dd>
-        </div>
-      </dl>
-    </div>
 
-    <div id="gallery-container" aria-label="Interactive Hash gallery"></div>
+        <div class="mol-controls">
+          <button type="button" class="mol-btn mol-btn--ghost" id="mol-prev" aria-label="Previous unit">← Prev</button>
+          <button type="button" class="mol-btn mol-btn--primary" id="mol-shuffle" aria-label="Randomize structure and colors">Randomize ↻</button>
+          <button type="button" class="mol-btn mol-btn--ghost" id="mol-next" aria-label="Next unit">Next →</button>
+        </div>
 
-    <div id="gallery-menu" aria-label="Gallery layouts">
-      <button id="layout-table" type="button">Table</button>
-      <button id="layout-sphere" type="button">Sphere</button>
-      <button id="layout-helix" type="button">Helix</button>
-      <button id="layout-grid" type="button">Grid</button>
+        <div class="mol-progress">
+          <div class="mol-progress-track">
+            <div class="mol-progress-fill" id="mol-progress-fill"></div>
+          </div>
+          <p class="mol-progress-text" id="mol-progress-text">1 / 1</p>
+        </div>
+
+        <p class="mol-hint" id="mol-hint">Real PDB molecules (three.js presets) · drag to orbit · colors randomize each transition</p>
+      </section>
+    </main>
+
+    <div id="mol-loader" class="mol-loader" aria-hidden="true">
+      <p class="mol-loader-label">Initializing molecular lab…</p>
+      <div class="mol-loader-bar"><span id="mol-loader-fill"></span></div>
     </div>
 
     <script type="module" src="/src/gallery-main.js"></script>

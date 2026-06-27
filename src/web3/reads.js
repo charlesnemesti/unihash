@@ -6,10 +6,37 @@ import {
   contractsConfigured,
   isDeployed,
 } from '../config/contracts.js';
+import { HOLDER_THRESHOLD_FALLBACK } from '../config/holder.js';
 import { liveDataEnabled } from '../config/launch.js';
 import { getPublicClient } from './provider.js';
 
 const DEFAULT_DECIMALS = 18;
+
+/** @type {number | null} */
+let cachedUnitThreshold = null;
+
+async function resolveUnitThreshold(client) {
+  if (cachedUnitThreshold !== null) return cachedUnitThreshold;
+
+  const address = isDeployed(CONTRACTS.hashToken) ? CONTRACTS.hashToken : CONTRACTS.unihash;
+  if (!isDeployed(address)) {
+    cachedUnitThreshold = HOLDER_THRESHOLD_FALLBACK;
+    return cachedUnitThreshold;
+  }
+
+  try {
+    const [unitRaw, decimals] = await Promise.all([
+      client.readContract({ address, abi: unihashAbi, functionName: 'UNIT' }),
+      client.readContract({ address, abi: unihashAbi, functionName: 'decimals' }).catch(() => DEFAULT_DECIMALS),
+    ]);
+    const unit = Number.parseFloat(formatUnits(unitRaw, Number(decimals)));
+    cachedUnitThreshold = unit > 0 ? unit : HOLDER_THRESHOLD_FALLBACK;
+  } catch {
+    cachedUnitThreshold = HOLDER_THRESHOLD_FALLBACK;
+  }
+
+  return cachedUnitThreshold;
+}
 
 /**
  * @typedef {Object} WalletBalances
@@ -40,6 +67,7 @@ export async function readWalletBalances(address) {
   let hashBalanceRaw = 0n;
   let hashesOwned = 0;
   let claimableEth = 0;
+  const unitThreshold = await resolveUnitThreshold(client);
 
   if (isDeployed(CONTRACTS.hashToken)) {
     const [balance, tokenDecimals] = await Promise.all([
@@ -71,7 +99,7 @@ export async function readWalletBalances(address) {
     });
     hashesOwned = ownedIds.length;
   } else {
-    hashesOwned = Math.floor(hashBalance);
+    hashesOwned = Math.floor(hashBalance / unitThreshold);
   }
 
   if (isDeployed(CONTRACTS.rewardDistributor)) {
@@ -119,7 +147,7 @@ async function readClaimable(client, address) {
       }
     }
 
-    console.warn('[UniHash] Could not read claimable rewards:', error);
+    console.warn('[UniChain] Could not read claimable rewards:', error);
     return 0n;
   }
 }

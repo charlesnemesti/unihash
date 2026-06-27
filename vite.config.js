@@ -5,6 +5,12 @@ export default defineConfig({
   root: '.',
   publicDir: 'public',
   plugins: [react()],
+  server: {
+    watch: {
+      // Windows EBUSY when watching PDB assets opened by the browser/loader
+      ignored: ['**/public/models/pdb/**'],
+    },
+  },
   build: {
     outDir: 'dist',
     rollupOptions: {

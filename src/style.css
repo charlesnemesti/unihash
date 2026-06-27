@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Paleta fija: negro / blanco / amarillo fluor ── */
+/* ── UniChain lab: void azul-negro / fluor rojo + azul ── */
 :root {
-  --fluor: #dfff00;
-  --void: #000000;
-  --white: #ffffff;
+  --void: #04060d;
+  --void-lab: #0a1020;
+  --fluor: #00e5ff;
+  --fluor-blue: #00e5ff;
+  --fluor-red: #ff1a4b;
+  --fluor-violet: #7b2fff;
+  --bond: #c8e8ff;
+  --white: #e8f0ff;
 }
 
 @layer base {
@@ -43,6 +48,14 @@
 
   .bg-fluor {
     background-color: var(--fluor) !important;
+  }
+
+  .text-fluor-red {
+    color: var(--fluor-red) !important;
+  }
+
+  .border-fluor-red {
+    border-color: var(--fluor-red) !important;
   }
 }
 
@@ -276,6 +289,61 @@
     color: var(--fluor);
   }
 
+  .molecule-card {
+    @apply flex items-center gap-5 border bg-void p-5;
+    border-color: color-mix(in srgb, var(--fluor) 32%, transparent);
+    background:
+      radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--card-accent, var(--fluor)) 16%, transparent), transparent 34%),
+      color-mix(in srgb, var(--void) 92%, transparent);
+  }
+
+  .molecule-card--cyan {
+    --card-accent: var(--fluor-blue);
+  }
+
+  .molecule-card--red {
+    --card-accent: var(--fluor-red);
+  }
+
+  .molecule-card--violet {
+    --card-accent: var(--fluor-violet);
+  }
+
+  .molecule-card-graphic {
+    @apply flex h-24 w-24 shrink-0 items-center justify-center border bg-void;
+    border-color: color-mix(in srgb, var(--card-accent, var(--fluor)) 45%, transparent);
+    box-shadow: inset 0 0 24px color-mix(in srgb, var(--card-accent, var(--fluor)) 10%, transparent);
+  }
+
+  .molecule-card-graphic svg {
+    @apply h-full w-full;
+    overflow: visible;
+  }
+
+  .molecule-card-graphic line {
+    stroke: color-mix(in srgb, var(--bond) 85%, transparent);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .molecule-card-graphic circle {
+    fill: var(--card-accent, var(--fluor));
+    filter: drop-shadow(0 0 7px color-mix(in srgb, var(--card-accent, var(--fluor)) 55%, transparent));
+  }
+
+  .molecule-card-kicker {
+    @apply mb-2 font-mono text-[10px] uppercase tracking-[0.28em];
+    color: var(--card-accent, var(--fluor));
+  }
+
+  .molecule-card-title {
+    @apply font-terminal text-3xl leading-none text-white;
+  }
+
+  .molecule-card-body {
+    @apply mt-3 font-mono text-xs leading-relaxed text-white;
+  }
+
   .stat-cell {
     @apply border bg-void p-6 md:p-8;
     border-color: color-mix(in srgb, var(--fluor) 35%, transparent);
@@ -298,6 +366,56 @@
 
   .gallery-cell svg {
     @apply h-full w-full;
+  }
+
+  .molecule-index-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .molecule-index-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .molecule-index-grid {
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+    }
+  }
+
+  .molecule-index-cell {
+    position: relative;
+    margin: 0;
+    min-height: 8.75rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--fluor) 28%, transparent);
+    background: color-mix(in srgb, var(--void) 96%, transparent);
+  }
+
+  .molecule-index-cell img {
+    display: block;
+    width: 100%;
+    height: calc(100% - 1.75rem);
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(1.08) contrast(1.04);
+  }
+
+  .molecule-index-cell figcaption {
+    display: flex;
+    align-items: center;
+    height: 1.75rem;
+    padding: 0 0.55rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 80%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--fluor) 18%, transparent);
+    background: color-mix(in srgb, var(--void) 92%, transparent);
   }
 
   .wallet-panel {
@@ -491,6 +609,14 @@
     pointer-events: none;
   }
 
+  .site-bg-canvas--interactive {
+    pointer-events: auto;
+  }
+
+  .site-bg-canvas.is-static canvas {
+    opacity: 0.35;
+  }
+
   .site-bg-canvas canvas {
     display: block;
     width: 100%;
@@ -506,18 +632,29 @@
     height: 100dvh;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 100% 90% at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.25) 60%, rgba(0, 0, 0, 0.55) 100%),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, transparent 22%, transparent 78%, rgba(0, 0, 0, 0.65) 100%);
+      radial-gradient(ellipse 100% 90% at 50% 50%, transparent 0%, rgba(4, 6, 13, 0.35) 60%, rgba(4, 6, 13, 0.72) 100%),
+      linear-gradient(to bottom, rgba(4, 6, 13, 0.55) 0%, transparent 22%, transparent 78%, rgba(4, 6, 13, 0.78) 100%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        color-mix(in srgb, var(--fluor-blue) 4%, transparent) 39px,
+        color-mix(in srgb, var(--fluor-blue) 4%, transparent) 40px
+      );
   }
 
   .site-header-glass {
-    background: rgb(0 0 0 / 0.72);
+    background: color-mix(in srgb, var(--void-lab) 88%, transparent);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
 
   .ca-strip {
-    position: relative;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
     overflow: hidden;
     border-top: 1px solid color-mix(in srgb, var(--fluor) 22%, transparent);
     background: linear-gradient(
@@ -526,6 +663,8 @@
       color-mix(in srgb, var(--fluor) 6%, rgb(0 0 0 / 0.92)) 50%,
       rgb(0 0 0 / 0.95) 100%
     );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .ca-strip-glow {
@@ -601,6 +740,11 @@
     color: var(--fluor);
   }
 
+  .ca-strip-link.is-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
   .ca-copy-btn {
     border: 1px solid var(--fluor);
     background: color-mix(in srgb, var(--fluor) 12%, transparent);
@@ -617,6 +761,12 @@
   .ca-copy-btn:hover {
     background: color-mix(in srgb, var(--fluor) 22%, transparent);
     box-shadow: 0 0 14px color-mix(in srgb, var(--fluor) 40%, transparent);
+  }
+
+  .ca-copy-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 
   .ca-copy-btn.is-copied {
@@ -686,6 +836,61 @@
     font-size: clamp(1.875rem, 4.5vw, 4.125rem);
     line-height: 1.1;
     color: var(--white);
+  }
+
+  .hold-progress {
+    margin-top: 1.75rem;
+    max-width: 28rem;
+  }
+
+  .hold-progress-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bond);
+  }
+
+  .hold-progress-label strong {
+    color: var(--fluor-blue);
+    font-weight: 500;
+  }
+
+  .hold-progress-track {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 35%, transparent);
+    background: color-mix(in srgb, var(--void-lab) 80%, transparent);
+  }
+
+  .hold-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--fluor-red), var(--fluor-blue));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--fluor-blue) 55%, transparent);
+    transition: width 0.45s ease;
+  }
+
+  .hold-progress-note {
+    margin-top: 0.55rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 75%, transparent);
+  }
+
+  .hold-progress-note.is-stable {
+    color: var(--fluor-blue);
+  }
+
+  .hold-progress-note.is-burning {
+    color: var(--fluor-red);
   }
 
   .btn-gallery-cta {
@@ -775,7 +980,7 @@
     font-size: inherit;
     line-height: inherit;
     color: inherit;
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .hero-typewriter-ghost {
@@ -837,6 +1042,379 @@
 
   .site-main {
     padding-top: 0;
+    padding-bottom: 4.25rem;
+  }
+
+  /* ── Hero · interactive molecular Chain NFT lab ── */
+  .lab-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 9rem 0 4.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .lab-hero {
+      padding-top: 11rem;
+    }
+  }
+
+  .lab-hero-grid {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    max-width: none;
+    flex-direction: column;
+    gap: 2rem;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .lab-hero-grid {
+      position: absolute;
+      inset: 0;
+      display: block;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+  }
+
+  .lab-hero-left {
+    width: 100%;
+    max-width: 31rem;
+  }
+
+  @media (min-width: 1024px) {
+    .lab-hero-left {
+      position: fixed;
+      top: 50%;
+      left: clamp(0.75rem, 1.35vw, 1.75rem);
+      transform: translateY(-50%);
+      width: clamp(17rem, 22vw, 24rem);
+      max-width: min(24rem, calc(50vw - 14rem));
+      pointer-events: auto;
+      z-index: 4;
+    }
+  }
+
+  @media (min-width: 1500px) {
+    .lab-hero-left {
+      left: clamp(1rem, 1.8vw, 2.5rem);
+      width: clamp(19rem, 21vw, 25rem);
+    }
+  }
+
+  .lab-hero-title {
+    margin: 0;
+    font-family: VT323, monospace;
+    font-size: clamp(1.4rem, 3.2vw, 2.7rem);
+    line-height: 1;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  @media (min-width: 1024px) {
+    .lab-hero-title {
+      position: absolute;
+      top: clamp(7.9rem, 12vh, 9.5rem);
+      left: clamp(18.75rem, 24.5vw, 28rem);
+      right: clamp(12.5rem, 16vw, 17rem);
+      z-index: 3;
+      font-size: clamp(0.8rem, 1.6vw, 2rem);
+      line-height: 1;
+      white-space: nowrap;
+      text-overflow: clip;
+      pointer-events: none;
+    }
+  }
+
+  @media (min-width: 1500px) {
+    .lab-hero-title {
+      left: clamp(21rem, 24vw, 31rem);
+      right: clamp(13.5rem, 15vw, 18rem);
+      font-size: clamp(1rem, 1.45vw, 2.15rem);
+    }
+  }
+
+  .lab-hero-sub {
+    margin: 0.9rem 0 1.5rem;
+    max-width: 31rem;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--bond) 80%, transparent);
+  }
+
+  .lab-card {
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 30%, transparent);
+    background: color-mix(in srgb, var(--void-lab) 80%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 1.1rem 1.15rem;
+    box-shadow:
+      0 0 40px color-mix(in srgb, var(--fluor-blue) 12%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--fluor-blue) 15%, transparent);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .lab-card.is-transitioning {
+    opacity: 0.92;
+    transform: translateY(2px);
+  }
+
+  .lab-card-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .lab-card-id {
+    font-family: VT323, monospace;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .lab-card-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 70%, transparent);
+  }
+
+  .lab-spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .lab-spec {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 14%, transparent);
+    background: color-mix(in srgb, var(--void) 50%, transparent);
+  }
+
+  .lab-spec--wide {
+    grid-column: 1 / -1;
+  }
+
+  .lab-spec-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 55%, transparent);
+  }
+
+  .lab-spec-value {
+    font-size: 0.76rem;
+    color: var(--white);
+  }
+
+  .lab-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .lab-btn {
+    flex: 1;
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 35%, transparent);
+    background: transparent;
+    color: var(--white);
+    padding: 0.6rem 0.4rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .lab-btn:hover {
+    border-color: var(--fluor-blue);
+    color: var(--fluor-blue);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--fluor-blue) 30%, transparent);
+  }
+
+  .lab-btn--primary {
+    border-color: var(--fluor-red);
+    color: var(--fluor-red);
+    background: color-mix(in srgb, var(--fluor-red) 8%, transparent);
+  }
+
+  .lab-btn--primary:hover {
+    color: var(--void);
+    background: var(--fluor-red);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--fluor-red) 45%, transparent);
+  }
+
+  .lab-progress-track {
+    height: 4px;
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 25%, transparent);
+    background: color-mix(in srgb, var(--void) 60%, transparent);
+    margin-bottom: 0.4rem;
+  }
+
+  .lab-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--fluor-red), var(--fluor-blue));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--fluor-blue) 50%, transparent);
+    transition: width 0.5s ease;
+  }
+
+  .lab-progress-text {
+    margin: 0;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 70%, transparent);
+  }
+
+  .lab-hint {
+    margin: 0.65rem 0 0;
+    font-size: 0.55rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--bond) 50%, transparent);
+  }
+
+  .lab-hero-menu {
+    display: flex;
+    width: 100%;
+    max-width: 16rem;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  @media (min-width: 1024px) {
+    .lab-hero-menu {
+      position: fixed;
+      top: 50%;
+      right: clamp(0.75rem, 1.35vw, 1.75rem);
+      transform: translateY(-50%);
+      width: clamp(10.5rem, 13vw, 14rem);
+      max-width: min(14rem, calc(50vw - 17rem));
+      padding-left: 1rem;
+      border-left: 1px solid color-mix(in srgb, var(--fluor-blue) 18%, transparent);
+      pointer-events: auto;
+      z-index: 4;
+    }
+  }
+
+  @media (min-width: 1500px) {
+    .lab-hero-menu {
+      right: clamp(1rem, 1.8vw, 2.5rem);
+    }
+  }
+
+  .lab-menu-label {
+    margin: 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--fluor-blue);
+  }
+
+  .lab-menu-nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lab-menu-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--white) 8%, transparent);
+    color: var(--white);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+
+  .lab-menu-nav a:hover {
+    color: var(--fluor-blue);
+    padding-left: 0.4rem;
+  }
+
+  .lab-menu-index {
+    font-size: 0.6rem;
+    color: var(--fluor-blue);
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lab-menu-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--bond) 70%, transparent);
+  }
+
+  .lab-menu-stats .hero-stat-num {
+    color: var(--fluor-blue);
+  }
+
+  .lab-menu-buy {
+    align-self: flex-start;
+  }
+
+  .lab-loader {
+    position: absolute;
+    left: 50%;
+    bottom: 2.4rem;
+    transform: translateX(-50%);
+    z-index: 3;
+    width: min(16rem, 60vw);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .lab-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .lab-loader-bar {
+    height: 3px;
+    border: 1px solid color-mix(in srgb, var(--fluor-blue) 30%, transparent);
+    background: var(--void-lab);
+  }
+
+  .lab-loader-bar span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--fluor-red), var(--fluor-blue));
+    transition: width 0.3s ease;
+  }
+
+  .lab-scroll-hint {
+    position: absolute;
+    bottom: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  @media (max-width: 1023px) {
+    .lab-scroll-hint {
+      display: none;
+    }
   }
 
   /* ── Whitepaper · daemons.life/docs layout ── */

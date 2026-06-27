@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Molecule Capture</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: #050814;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      #capture-stage {
+        width: 720px;
+        height: 720px;
+        border: 1px solid rgba(0, 229, 255, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="capture-stage" aria-label="molecule capture stage"></div>
+
+    <script type="module">
+      import { ChainMorphPresenter } from '/src/three/pdb/ChainMorphPresenter.js';
+      import { PDB_MOLECULE_LIST } from '/src/three/pdb/pdb-registry.js';
+      import { getColorPattern } from '/src/three/pdb/color-patterns.js';
+
+      const params = new URLSearchParams(window.location.search);
+      const index = Number(params.get('i') ?? '0');
+      const safeIndex = Number.isFinite(index)
+        ? ((index % PDB_MOLECULE_LIST.length) + PDB_MOLECULE_LIST.length) % PDB_MOLECULE_LIST.length
+        : 0;
+
+      const stage = document.getElementById('capture-stage');
+      const presenter = new ChainMorphPresenter(stage, {
+        interactive: false,
+        autoRotate: false,
+        cameraZ: 1450,
+      });
+
+      const molecule = PDB_MOLECULE_LIST[safeIndex];
+      await presenter.present({
+        name: molecule.name,
+        file: molecule.file,
+        colorPattern: getColorPattern(0),
+      });
+
+      presenter.root.rotation.set(0.24, 0.58, 0);
+      presenter.renderer.render(presenter.scene, presenter.camera);
+
+      window.__captureReady = true;
+      document.body.dataset.rendered = 'true';
+      document.body.dataset.molecule = molecule.name;
+    </script>
+  </body>
+</html>

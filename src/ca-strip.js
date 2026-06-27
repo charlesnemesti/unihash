@@ -50,6 +50,27 @@ export function initCaStrip() {
   if (strip.dataset.initialized === 'true') return;
   strip.dataset.initialized = 'true';
 
+  const SHOW_TBA = true;
+
+  if (SHOW_TBA) {
+    display.textContent = 'TBA';
+    display.classList.add('is-revealed');
+
+    if (explorerLink) {
+      explorerLink.textContent = 'TBA';
+      explorerLink.removeAttribute('href');
+      explorerLink.setAttribute('aria-disabled', 'true');
+      explorerLink.classList.add('is-disabled');
+    }
+
+    if (copyBtn) {
+      copyBtn.textContent = 'TBA';
+      copyBtn.disabled = true;
+    }
+
+    return;
+  }
+
   display.textContent = '0x' + '█'.repeat(40);
   revealTerminalText(display, UNIHASH_CA);
 
